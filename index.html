@@ -447,6 +447,91 @@ h1,h2,h3,p{margin:0}
 .susp .face img{width:100%;height:100%;object-fit:cover;object-position:top center}
 @media(max-width:640px){.suspects{grid-template-columns:repeat(2,1fr)}}
 
+/* ============================================================
+   현장 조사 강화 · 실시간 용의자 의심 보드(P1) + 미니 추리(P2) + 발견 연출(P3)
+   -- 색/톤은 위 :root 토큰을 그대로 사용
+   ============================================================ */
+.sb{margin-top:22px;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,#191009,#130c06);box-shadow:0 16px 44px rgba(0,0,0,.5)}
+.sb-head{display:flex;align-items:center;gap:9px;padding:13px 16px;
+  border-bottom:1px solid var(--line);background:rgba(232,176,75,.05)}
+.sb-head .ico{font-size:18px}
+.sb-head .ttl{font-weight:900;font-size:15px;color:var(--ink);letter-spacing:.02em}
+.sb-head .meta{font-size:12px;color:var(--muted);font-family:var(--fontm);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.sb-head .chev{margin-left:auto;font-size:15px;color:var(--gold);transition:transform .3s;display:none}
+.sb-body{padding:14px 16px 16px}
+.sb-note{font-size:13.5px;line-height:1.65;color:var(--manila);font-style:italic;
+  border-left:2px solid var(--gold-soft);padding:3px 0 3px 12px;margin-bottom:14px;transition:.3s}
+.sb-note b{color:var(--gold);font-style:normal}
+.sb-note.trap{border-left-color:var(--danger)}.sb-note.trap b{color:var(--danger)}
+.sb-note.solved{color:var(--ok);border-left-color:var(--ok)}.sb-note.solved b{color:var(--ok)}
+.sb-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sb-card{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  padding:12px 12px 13px;transition:box-shadow .25s,border-color .25s,opacity .3s,filter .3s;overflow:hidden}
+.sb-card .por{width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;object-position:top center;
+  background:#0c0906;filter:grayscale(.15);display:block}
+.sb-card .nm{font-weight:800;font-size:14px;color:var(--ink);margin-top:9px}
+.sb-card .rl{font-size:11.5px;color:var(--muted);margin-top:1px;min-height:15px}
+.sb-bar{margin-top:9px;height:9px;border-radius:6px;background:#0c0906;border:1px solid var(--line);overflow:hidden}
+.sb-fill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#c99a3f,#e0604a);
+  transition:width .8s cubic-bezier(.34,1.35,.5,1)}
+.sb-pct{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-family:var(--fontm)}
+.sb-pct .lb{font-size:10.5px;color:var(--muted)}
+.sb-pct .vl{font-size:12px;font-weight:700;color:var(--gold-soft);transition:color .3s}
+.sb-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:900;padding:3px 7px;border-radius:20px;
+  background:var(--danger);color:#fff;opacity:0;transform:scale(.6);transition:.3s;pointer-events:none;
+  box-shadow:0 2px 8px rgba(224,96,74,.5)}
+.sb-card.lead{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger),0 8px 24px rgba(224,96,74,.22)}
+.sb-card.lead .sb-badge{opacity:1;transform:scale(1)}
+.sb-card.lead .vl{color:var(--danger)}
+.sb-card.spot{animation:sbSpot .85s ease}
+@keyframes sbSpot{0%{transform:none}28%{transform:translateY(-7px) scale(1.045);
+  box-shadow:0 0 0 2px var(--gold),0 16px 32px rgba(232,176,75,.45)}100%{transform:none}}
+.sb-card.cleared{opacity:.5}.sb-card.cleared .por{filter:grayscale(1)}
+@media(max-width:640px){
+  .sb-head{cursor:pointer}
+  .sb-head .chev{display:block}
+  .sb.collapsed .sb-body{display:none}
+  .sb.collapsed .sb-head .chev{transform:rotate(-90deg)}
+  .sb-cards{grid-template-columns:repeat(2,1fr);gap:9px}
+  .sb-card .rl{display:none}
+}
+/* ── 발견 연출 버스트 ── */
+.disc{position:fixed;inset:0;z-index:130;display:none;align-items:center;justify-content:center;pointer-events:none}
+.disc.on{display:flex}
+.disc .burst{text-align:center;animation:discPop 1s ease forwards}
+.disc .em{font-size:86px;line-height:1;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))}
+.disc .tag{margin-top:8px;font-weight:900;font-size:22px;letter-spacing:.04em;color:var(--gold);
+  text-shadow:0 3px 16px rgba(232,176,75,.55)}
+.disc .tag.trap{color:var(--danger);text-shadow:0 3px 16px rgba(224,96,74,.6)}
+@keyframes discPop{0%{transform:scale(.3);opacity:0}18%{transform:scale(1.14);opacity:1}
+  32%{transform:scale(1)}72%{opacity:1}100%{transform:scale(1.06);opacity:0}}
+/* ── 대화 타자기 커서 + 핵심 하이라이트 ── */
+.dlg-text .cur{display:inline-block;width:.5em;color:var(--gold)}
+.dlg-text .hl{color:var(--gold);font-weight:700}
+/* ── 미니 추리(P2) ── */
+.dlg-deduce{display:none;margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+.dlg-deduce.show{display:block;animation:fade .3s}
+.dlg-deduce .q{font-size:13.5px;font-weight:800;color:var(--ink);margin-bottom:10px}
+.dd-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.dd-s{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:7px 4px 8px;
+  cursor:pointer;text-align:center;transition:.15s;color:inherit;font:inherit}
+.dd-s:hover{border-color:var(--gold-soft);transform:translateY(-2px)}
+.dd-s img{width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;object-position:top center;display:block}
+.dd-s .nm{font-size:11px;font-weight:700;color:var(--ink);margin-top:4px}
+.dd-s.right{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok),0 0 14px rgba(123,200,108,.35)}
+.dd-s.wrong{border-color:var(--danger);animation:shake .4s}
+.dd-s.dim{opacity:.4}
+.dd-fb{margin-top:11px;font-size:13px;line-height:1.6;font-weight:600;min-height:18px;text-align:center}
+.dd-fb.ok{color:var(--ok)}.dd-fb.no{color:var(--danger)}.dd-fb b{color:inherit}
+/* ── 효과음 토글 ── */
+.mute{position:fixed;left:14px;bottom:16px;z-index:120;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(20,13,7,.92);color:var(--gold);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.mute:hover{border-color:var(--gold-soft)}
+.shakeit{animation:shake .45s}
+
 </style>
 </head>
 <body>
@@ -474,6 +559,7 @@ h1,h2,h3,p{margin:0}
     <div class="stat hl"><div class="lb">사건번호</div><div class="vl mono">SOLOMON-2026</div></div>
     <div class="stat"><div class="lb">수집한 증거</div><div class="vl"><span id="evCount">0</span> / 7</div></div>
     <div class="stat"><div class="lb">감식 실험</div><div class="vl"><span id="expCount">0</span> / 1</div></div>
+    <div class="stat"><div class="lb">추리 점수</div><div class="vl"><span id="deduceScore">0</span></div></div>
   </div>
 </div>
 
@@ -518,6 +604,20 @@ h1,h2,h3,p{margin:0}
         <div class="ev-status" id="evStatus">물체를 눌러 증거를 모으세요</div>
       </div>
     </div>
+
+  <!-- 실시간 용의자 의심 보드 (단서를 모을수록 의심도가 움직여요) -->
+  <div class="sb" id="sbWrap">
+    <div class="sb-head" id="sbHead">
+      <span class="ico">🕵️</span>
+      <span class="ttl">용의자 수사 보드</span>
+      <span class="meta" id="sbMeta">단서를 모으면 의심도가 실시간으로 변해요</span>
+      <span class="chev">▾</span>
+    </div>
+    <div class="sb-body">
+      <div class="sb-note" id="sbNote">아직 아무 단서도 없어요. 현장의 물건을 눌러 조사를 시작하세요.</div>
+      <div class="sb-cards" id="sbCards"></div>
+    </div>
+  </div>
 
   <div class="gobar mt2">
     <div class="acc l"></div>
@@ -629,10 +729,17 @@ h1,h2,h3,p{margin:0}
       <div class="dlg-body"><div class="dlg-name" id="dlgName"></div><div class="dlg-text" id="dlgText"></div></div>
     </div>
     <div class="dlg-clue" id="dlgClue"></div>
+    <div class="dlg-deduce" id="dlgDeduce">
+      <div class="q" id="ddQ">🔎 이 단서는 누구를 가리킬까요?</div>
+      <div class="dd-row" id="ddRow"></div>
+      <div class="dd-fb" id="ddFb"></div>
+    </div>
     <div class="dlg-foot"><span class="dlg-dots" id="dlgDots"></span><button class="btn dlg-next" id="dlgNext">다음 ▶</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="disc" id="disc"><div class="burst"><div class="em" id="discEm">🔍</div><div class="tag" id="discTag">단서 발견!</div></div></div>
+<button class="mute" id="muteBtn" title="효과음 켜기/끄기" aria-label="효과음 켜기/끄기">🔊</button>
 
 <script>
 const IMG={
@@ -657,7 +764,7 @@ const STORY={
  laptop:[
   {s:null,t:'법정 노트북이 아직 켜져 있다. 마지막 접속 기록을 확인한다.'},
   {s:null,t:'[기록] 밤 11시 47분 — "USB 증거파일"이 열렸습니다.'},
-  {s:null,t:'그날 USB를 가장 먼저 열어본 사람은… 변호사 강도훈이었다.'},
+  {s:null,t:'그날 USB를 가장 먼저 열어본 사람은… 변호사 **강도훈**이었다.'},
   {s:'dohoon',t:'…그 파일만 없었으면, 오늘 재판은 내가 이기는 거였어.'}
  ],
  safe:[
@@ -672,18 +779,18 @@ const STORY={
  ],
  trash:[
   {s:null,t:'휴지통에서 구겨진 증거 목록을 펴 본다.'},
-  {s:null,t:'강도훈에게 불리한 항목만 골라 지워지고 찢겨 있다.'},
+  {s:null,t:'**강도훈에게 불리한 항목만** 골라 지워지고 찢겨 있다.'},
   {s:'dohoon',t:'증거? …그런 건 처음부터 없었던 걸로 하면 그만이지.'}
  ],
  jacket:[
   {s:null,t:'의자에 걸린 낡은 가죽 자켓. 경위 박철웅의 것이다.'},
-  {s:null,t:'주머니에서 빚 독촉장이 나온다.'},
+  {s:null,t:'주머니에서 **빚 독촉장**이 나온다.'},
   {s:'cheolung',t:'…돈이 급했던 건 맞아. 근데 그 USB엔 손도 안 댔어. 정말이야.'},
   {s:null,t:'자켓엔 머리카락도 한 올 붙어 있다. 함정일까? (→ 과학수사: DNA 분석)'}
  ],
  note:[
   {s:null,t:'바닥에 떨어진 찢어진 메모. 급하게 갈겨쓴 글씨다.'},
-  {s:null,t:'"USB를 열어본 사람이… 가장 먼저 의심받는다."'},
+  {s:null,t:'**"USB를 열어본 사람이… 가장 먼저 의심받는다."**'},
   {s:'junhyeok',t:'전 방청석에 있었을 뿐이에요. …근데 저 노트북 로그, 뭔가 손댄 흔적이 있던데요?'},
   {s:null,t:'오른손잡이 특유의 글씨체. 필적 감정이 필요하다. (→ 과학수사: 필적 감정)'}
  ],
@@ -705,6 +812,28 @@ const CLUE_SUM={
  file:'<b>단서:</b> 용의자 4명 확보! 실험 결과와 맞춰 진범을 좁혀보자.'
 };
 const CLUE_ORDER=['laptop','safe','mug','trash','jacket','note','file'];
+
+/* 현장 조사 강화용: 단서별 의심도 변화 / 미니 추리 정답 / 발견 연출
+   susp: 이 단서로 올라가는 용의자별 의심도(누적, %)
+   ask : 미니 추리 정답 용의자 (없으면 추리 단계 없이 넘어감)
+   trap: 함정 단서(현장에 있었지만 범인은 아님) / key: 결정적 단서
+   burst:[이모지,문구] 발견 시 화면 연출 / why: 추리 정답 해설 */
+const SCENE_INTEL={
+ laptop:{susp:{dohoon:30}, ask:'dohoon', key:true, burst:['💻','접속 기록 확보!'],
+   why:'맞아요! USB를 <b>가장 먼저 연 사람</b>이 강도훈이에요. 강력한 단서!'},
+ safe:{susp:{seoyeon:25}, ask:'seoyeon', burst:['🔒','금고 발견!'],
+   why:'그래요, 금고 <b>비밀번호를 아는 사람</b>은 정서연이었죠. 수상해요.'},
+ mug:{susp:{dohoon:10,junhyeok:10}, handoff:true, key:true, burst:['☕','결정적 지문 확보!'],
+   why:''},
+ trash:{susp:{dohoon:25}, ask:'dohoon', burst:['🗑️','숨겨진 동기!'],
+   why:'정확해요! 증거가 사라지면 <b>강도훈에게 유리</b>해져요. 동기를 찾았어요.'},
+ jacket:{susp:{cheolung:40}, ask:'cheolung', trap:true, burst:['🧥','함정 단서?!'],
+   why:'박철웅은 돈이 급했고 현장에도 있었어요. 하지만 <b>현장에 있었다고 범인은 아니에요.</b> 과학수사로 확인해요!'},
+ note:{susp:{dohoon:20,junhyeok:10}, ask:'dohoon', burst:['📝','현장 메모!'],
+   why:'좋아요! 메모의 주인은 <b>오른손잡이 + USB를 연 사람</b> — 강도훈을 가리켜요. (이준혁의 교란에 속지 마세요!)'},
+ file:{susp:{dohoon:5,seoyeon:5,cheolung:5,junhyeok:5}, roster:true, burst:['📁','용의자 4명 확인!'],
+   why:''}
+};
 
 /* 실험: 정답 index / 나오는 숫자 / 설명 */
 const EXPERIMENTS=[
@@ -764,6 +893,7 @@ const QUIZ=[
    상태 & 유틸
    ========================================================= */
 const S={clues:new Set(),exps:new Set(),code:'',aiDone:false,safeOpen:false,quizDone:new Set(),score:0,adm:new Set(),accused:false};
+S.suspicion={}; S.deduceScore=0; S.deduced=new Set(); S._pending=null; S._wonScene=false;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1700);}
 
@@ -779,12 +909,106 @@ function go(id){
 }
 
 /* ---------- 1. 현장 조사 (대화형 스토리) ---------- */
-let DLG={beats:[],i:0};
+/* ============================================================
+   효과음 엔진 (Web Audio · 가벼운 신스음) + 햅틱
+   ============================================================ */
+let _ac=null, _muted=false;
+function ac(){ if(_muted)return null;
+  if(!_ac){ try{_ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){_ac=null;} }
+  if(_ac&&_ac.state==='suspended'){ try{_ac.resume();}catch(e){} }
+  return _ac; }
+function tone(f,t0,dur,type,vol){ const c=_ac; if(!c)return;
+  const o=c.createOscillator(), g=c.createGain(); o.type=type||'sine'; o.frequency.value=f;
+  o.connect(g); g.connect(c.destination); const now=c.currentTime+t0;
+  g.gain.setValueAtTime(.0001,now); g.gain.linearRampToValueAtTime(vol||.14,now+.012);
+  g.gain.exponentialRampToValueAtTime(.0001,now+dur); o.start(now); o.stop(now+dur+.03); }
+function sfx(name){ const c=ac(); if(!c)return;
+  if(name==='discover'){ tone(523,0,.12,'triangle',.14); tone(784,.09,.17,'triangle',.14); }
+  else if(name==='key'){ tone(659,0,.1,'triangle',.15); tone(880,.09,.12,'triangle',.15); tone(1175,.19,.24,'triangle',.15); }
+  else if(name==='correct'){ tone(659,0,.09,'square',.09); tone(831,.08,.09,'square',.09); tone(988,.16,.2,'square',.09); }
+  else if(name==='wrong'){ tone(185,0,.22,'sawtooth',.11); tone(140,.06,.26,'sawtooth',.09); }
+  else if(name==='trap'){ tone(440,0,.16,'sawtooth',.12); tone(415,.02,.2,'sawtooth',.09); tone(220,.17,.42,'sawtooth',.13); }
+  else if(name==='tick'){ tone(680,0,.07,'sine',.08); }
+  else if(name==='win'){ [523,659,784,1047].forEach((f,i)=>tone(f,i*.1,.24,'triangle',.14)); } }
+function vibrate(p){ try{ if(!_muted && navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+$('#muteBtn').addEventListener('click',()=>{ _muted=!_muted; $('#muteBtn').textContent=_muted?'🔇':'🔊'; if(!_muted) ac(); });
+
+/* ============================================================
+   실시간 용의자 의심 보드 (P1)
+   ============================================================ */
+function buildBoard(){ const cw=$('#sbCards'); if(!cw)return;
+  cw.innerHTML=SUSPECTS.map(s=>
+    '<div class="sb-card" id="sb-'+s.id+'">'
+    +'<span class="sb-badge">가장 유력 ⚠</span>'
+    +'<img class="por" src="'+s.img+'" alt="'+s.nm+'">'
+    +'<div class="nm">'+s.nm+'</div><div class="rl">'+s.role+'</div>'
+    +'<div class="sb-bar"><div class="sb-fill" id="sbf-'+s.id+'"></div></div>'
+    +'<div class="sb-pct"><span class="lb">의심도</span><span class="vl" id="sbv-'+s.id+'">0%</span></div>'
+    +'</div>').join(''); }
+function topSuspect(){ let lead=null,max=-1; SUSPECTS.forEach(s=>{ const v=S.suspicion[s.id]||0; if(v>max){max=v;lead=s.id;} }); return {id:lead,val:max}; }
+function renderBoard(spotId){
+  const t=topSuspect();
+  SUSPECTS.forEach(s=>{ const v=Math.min(100,S.suspicion[s.id]||0);
+    const f=$('#sbf-'+s.id), vl=$('#sbv-'+s.id), card=$('#sb-'+s.id);
+    if(f) f.style.width=v+'%'; if(vl) vl.textContent=v+'%';
+    if(card) card.classList.toggle('lead', s.id===t.id && t.val>0); });
+  if(spotId){ const c=$('#sb-'+spotId); if(c){ c.classList.remove('spot'); void c.offsetWidth; c.classList.add('spot'); } }
+  const m=$('#sbMeta');
+  if(m){ if(t.val>0){ const ln=SUS[t.id]?SUS[t.id].name:''; m.textContent='가장 유력: '+ln+' · '+Math.min(100,t.val)+'%'; }
+    else m.textContent='단서를 모으면 의심도가 실시간으로 변해요'; } }
+function updateNote(it){ const el=$('#sbNote'); if(!el)return;
+  el.classList.remove('trap','solved');
+  const n=S.clues.size, t=topSuspect(), ln=t.id?SUS[t.id].name:'';
+  if(it && it.trap){ el.classList.add('trap');
+    el.innerHTML='<b>박철웅</b>이 갑자기 유력해 보여요 — 돈도 급했고 현장에도 있었죠. 그런데 정말 범인일까요? 🤔 섣불리 단정하면 안 돼요!'; return; }
+  if(n>=7){ el.classList.add('solved');
+    el.innerHTML='단서 7개 완성! 지금은 <b>'+ln+'</b>이 가장 의심스럽지만, 확신은 일러요. 이제 <b>과학수사</b>로 진짜 범인을 가려낼 차례!';
+    if(!S._wonScene){ S._wonScene=true; sfx('win'); } return; }
+  el.innerHTML='지금까지 가장 의심스러운 사람은 <b>'+ln+'</b>… 하지만 단서가 더 필요해요. ('+n+'/7 단서)'; }
+function applyIntel(id){ const it=SCENE_INTEL[id]; if(!it)return;
+  let spot=null,best=-1;
+  Object.keys(it.susp||{}).forEach(k=>{ S.suspicion[k]=(S.suspicion[k]||0)+it.susp[k]; if(it.susp[k]>best){best=it.susp[k];spot=k;} });
+  renderBoard(spot); updateNote(it);
+  sfx(it.trap?'trap':'tick'); if(it.trap) vibrate([40,40,40]);
+  const sb=$('#sbWrap'); if(sb) sb.classList.remove('collapsed'); }
+
+/* 모바일 접기/펴기 */
+$('#sbHead').addEventListener('click',()=>{ if(window.matchMedia('(max-width:640px)').matches) $('#sbWrap').classList.toggle('collapsed'); });
+
+/* ============================================================
+   발견 연출 버스트 (P3)
+   ============================================================ */
+function showDiscovery(it){ const d=$('#disc'); if(!d||!it)return;
+  $('#discEm').textContent=(it.burst&&it.burst[0])||'🔍';
+  $('#discTag').textContent=(it.burst&&it.burst[1])||'단서 발견!';
+  $('#discTag').className='tag'+(it.trap?' trap':'');
+  d.classList.remove('on'); void d.offsetWidth; d.classList.add('on');
+  sfx(it.trap?'trap':(it.key?'key':'discover')); vibrate(it.trap?[40,40,40]:40);
+  clearTimeout(d._t); d._t=setTimeout(()=>d.classList.remove('on'),1000); }
+
+/* ============================================================
+   대화 팝업 · 타자기(P3) + 미니 추리(P2)
+   ============================================================ */
+let DLG={beats:[],i:0,id:null,typing:false};
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function parseHL(str){ const parts=String(str).split('**'), seg=[];
+  parts.forEach((p,i)=>{ if(p!=='') seg.push({t:p, hl:i%2===1}); }); return seg; }
+function typeInto(el,str,cb){ const seg=parseHL(str), full=seg.reduce((a,s)=>a+s.t,'');
+  clearInterval(el._tw); let i=0;
+  function draw(k){ let out='',c=0;
+    for(const s of seg){ if(c>=k)break; const take=Math.min(s.t.length,k-c), chunk=s.t.slice(0,take);
+      out+= s.hl?'<span class="hl">'+esc(chunk)+'</span>':esc(chunk); c+=s.t.length; }
+    el.innerHTML=out+(k<full.length?'<span class="cur">▍</span>':''); }
+  el._finish=()=>{ clearInterval(el._tw); el._tw=null; draw(full.length); el._finish=null; if(cb)cb(); };
+  el._tw=setInterval(()=>{ i++; draw(i); if(i>=full.length) el._finish&&el._finish(); },18); }
+function finishTyping(){ const tx=$('#dlgText'); if(tx&&tx._finish) tx._finish(); }
+
 function openDialogue(id){
-  DLG={beats:STORY[id]||[],i:0};
-  document.getElementById('dlgHead').textContent=HEAD[id]||'현장 조사';
-  const cl=document.getElementById('dlgClue'); cl.className='dlg-clue'; cl.innerHTML=CLUE_SUM[id]||'';
-  document.getElementById('dlgBg').classList.add('on');
+  DLG={beats:STORY[id]||[], i:0, id:id, typing:false};
+  $('#dlgHead').textContent=HEAD[id]||'현장 조사';
+  const cl=$('#dlgClue'); cl.className='dlg-clue'; cl.innerHTML='';
+  $('#dlgDeduce').classList.remove('show'); $('#dlgNext').style.visibility='';
+  $('#dlgBg').classList.add('on');
   renderBeat();
 }
 function renderBeat(){
@@ -792,16 +1016,59 @@ function renderBeat(){
   if(b.s && SUS[b.s]){ p.src=SUS[b.s].img; p.classList.add('show');
     nm.textContent=SUS[b.s].name+' · '+SUS[b.s].role; tx.className='dlg-text'; }
   else { p.classList.remove('show'); p.removeAttribute('src'); nm.textContent='🔍 현장'; tx.className='dlg-text narr'; }
-  tx.textContent=b.t;
+  const last=DLG.i>=DLG.beats.length-1, cl=$('#dlgClue'), dd=$('#dlgDeduce');
   $('#dlgDots').innerHTML=DLG.beats.map((_,k)=>'<i class="'+(k<=DLG.i?'on':'')+'"></i>').join('');
-  const last=DLG.i>=DLG.beats.length-1;
-  $('#dlgNext').textContent=last?'단서 확인 후 닫기 ✓':'다음 ▶';
-  document.getElementById('dlgClue').classList.toggle('show',last);
+  dd.classList.remove('show'); cl.classList.remove('show');
+  DLG.typing=true; $('#dlgNext').disabled=true; $('#dlgNext').textContent='…';
+  typeInto(tx, b.t, ()=>{
+    DLG.typing=false; $('#dlgNext').disabled=false;
+    if(!last){ $('#dlgNext').style.visibility=''; $('#dlgNext').textContent='다음 ▶'; return; }
+    const it=SCENE_INTEL[DLG.id];
+    if(it && it.ask && !S.deduced.has(DLG.id)){ showDeduction(DLG.id); }
+    else { cl.innerHTML=CLUE_SUM[DLG.id]||''; cl.classList.add('show');
+      $('#dlgNext').style.visibility=''; $('#dlgNext').textContent='단서 확인 후 닫기 ✓'; }
+  });
 }
-function nextBeat(){ if(DLG.i>=DLG.beats.length-1){ $('#dlgBg').classList.remove('on'); return; } DLG.i++; renderBeat(); }
+function showDeduction(id){
+  const it=SCENE_INTEL[id], dd=$('#dlgDeduce'), row=$('#ddRow'), fb=$('#ddFb'), cl=$('#dlgClue');
+  fb.textContent=''; fb.className='dd-fb'; let wrong=0;
+  row.innerHTML=SUSPECTS.map(s=>'<button class="dd-s" data-id="'+s.id+'"><img src="'+s.img+'" alt="'+s.nm+'"><div class="nm">'+s.nm+'</div></button>').join('');
+  cl.classList.remove('show'); $('#dlgNext').style.visibility='hidden';
+  dd.classList.add('show');
+  function reveal(msgClass,msgHtml){
+    const rb=row.querySelector('.dd-s[data-id="'+it.ask+'"]'); rb.classList.add('right');
+    row.querySelectorAll('.dd-s').forEach(x=>{ if(x!==rb) x.classList.add('dim'); x.style.pointerEvents='none'; });
+    fb.className='dd-fb '+msgClass; fb.innerHTML=msgHtml; S.deduced.add(id);
+    cl.innerHTML=CLUE_SUM[id]||''; cl.classList.add('show');
+    $('#dlgNext').style.visibility=''; $('#dlgNext').textContent='단서 확인 후 닫기 ✓';
+  }
+  row.querySelectorAll('.dd-s').forEach(b=>{ b.onclick=()=>{
+    const pick=b.dataset.id;
+    if(pick===it.ask){ const pts=wrong===0?10:(wrong===1?5:0); addScore(pts); sfx('correct'); vibrate(30);
+      reveal('ok','✓ '+(pts?'+'+pts+'점! ':'')+it.why); }
+    else { wrong++; b.classList.add('wrong'); sfx('wrong'); setTimeout(()=>b.classList.remove('wrong'),400);
+      if(wrong>=2){ reveal('no','정답은 <b>'+SUS[it.ask].name+'</b>! '+it.why); }
+      else { fb.className='dd-fb no'; fb.textContent='🤔 음… 다시 생각해봐요. 단서를 다시 읽어보세요!'; } }
+  }; });
+}
+function addScore(n){ if(!n)return; S.deduceScore+=n; const el=$('#deduceScore'); if(el) el.textContent=S.deduceScore; }
+function closeDialogue(){
+  $('#dlgBg').classList.remove('on');
+  const tx=$('#dlgText'); if(tx&&tx._tw){ clearInterval(tx._tw); tx._tw=null; }
+  if(S._pending){ const id=S._pending; S._pending=null; setTimeout(()=>applyIntel(id),200); }
+}
+function nextBeat(){
+  if(DLG.typing){ finishTyping(); return; }
+  if(DLG.i>=DLG.beats.length-1){
+    const it=SCENE_INTEL[DLG.id];
+    if(it && it.ask && !S.deduced.has(DLG.id)){ showDeduction(DLG.id); return; }
+    closeDialogue(); return;
+  }
+  DLG.i++; renderBeat();
+}
 $('#dlgNext').addEventListener('click',nextBeat);
-$('#dlgX').addEventListener('click',()=>$('#dlgBg').classList.remove('on'));
-$('#dlgBg').addEventListener('click',e=>{if(e.target===$('#dlgBg'))$('#dlgBg').classList.remove('on');});
+$('#dlgX').addEventListener('click',closeDialogue);
+$('#dlgBg').addEventListener('click',e=>{ if(e.target===$('#dlgBg')) closeDialogue(); });
 
 const EV={laptop:['💻','노트북'],mug:['☕','커피잔'],safe:['🔒','금고'],trash:['🗑️','구겨진 종이'],jacket:['🧥','가죽 자켓'],note:['📝','찢어진 메모'],file:['📁','기밀 문서']};
 function collectEvidence(id){
@@ -811,16 +1078,20 @@ function collectEvidence(id){
   const st=document.getElementById('evStatus');
   if(st){ const n=S.clues.size; if(n>=7){ st.textContent='증거 7개 모두 수집 완료!'; st.classList.add('done'); } else { st.textContent=(7-n)+'개 더 찾아보세요'; } }
 }
+buildBoard(); renderBoard();
 $$('.hotspot').forEach(h=>{
   h.addEventListener('click',()=>{
-    const id=h.dataset.id;
-    openDialogue(id);
-    if(!S.clues.has(id)){
+    const id=h.dataset.id, fresh=!S.clues.has(id);
+    if(fresh){
       S.clues.add(id); h.classList.add('collected');
+      h.classList.add('shakeit'); setTimeout(()=>h.classList.remove('shakeit'),460);
       $('#evCount').textContent=S.clues.size;
       collectEvidence(id);
+      showDiscovery(SCENE_INTEL[id]);
+      S._pending=id;
       if(S.clues.size===7){ $('#toLab').disabled=false; markTabDone(0); }
     }
+    openDialogue(id);
   });
 });
 $('#toLab').addEventListener('click',()=>go('lab'));
