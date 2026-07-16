@@ -447,6 +447,80 @@ h1,h2,h3,p{margin:0}
 .susp .face img{width:100%;height:100%;object-fit:cover;object-position:top center}
 @media(max-width:640px){.suspects{grid-template-columns:repeat(2,1fr)}}
 
+/* ==== 잠긴 실험 ==== */
+.exp.exp-locked{opacity:.45;filter:grayscale(.6)}
+.exp.exp-locked .exp-body{pointer-events:none}
+.exp-lockmsg{font-size:12.5px;color:var(--danger);font-family:var(--fontm);margin:4px 0 8px}
+
+/* ==== 필적 감정 ==== */
+.memo-paper{background:linear-gradient(180deg,#efe6cf,#e3d5b4);color:#3a2c14;border-radius:10px;
+  padding:20px 22px;max-width:420px;margin:0 auto 12px;box-shadow:0 8px 24px rgba(0,0,0,.45);
+  font-family:'Nanum Pen Script',cursive,var(--fontd);position:relative;transform:rotate(-1.2deg)}
+.memo-paper .ml{display:block;font-size:21px;font-weight:700;letter-spacing:-.02em;
+  transform:skewX(-6deg) rotate(-2deg);line-height:1.5}
+.memo-paper .ml.small{font-size:16px;opacity:.85;margin-top:8px}
+.memo-paper::after{content:'';position:absolute;top:-6px;right:18px;width:70px;height:16px;
+  background:rgba(255,255,255,.35);transform:rotate(3deg)}
+.hw-points{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.hw-point{flex:1;min-width:140px;border:2px solid var(--line);border-radius:12px;padding:12px;
+  background:#0c0904;cursor:pointer;text-align:center;transition:.15s}
+.hw-point:hover{border-color:var(--gold);transform:translateY(-2px)}
+.hw-point.found{border-color:var(--ok);background:rgba(123,200,108,.07);cursor:default;transform:none}
+.hw-point .hp-ico{font-size:24px}
+.hw-point .hp-q{font-size:13px;font-weight:700;margin:6px 0 2px}
+.hw-point .hp-a{font-size:12px;color:var(--muted);line-height:1.55;display:none}
+.hw-point.found .hp-a{display:block}
+.hw-point.found .hp-q{color:var(--ok)}
+.hwc{border:2px solid var(--line);border-radius:14px;padding:12px;text-align:center;
+  background:#0c0904;min-width:140px;flex:1;transition:.2s}
+.hwc .feat{font-size:11.5px;font-family:var(--fontm);color:var(--muted);margin:4px 0;min-height:48px;text-align:left;line-height:1.7}
+.hwc .feat b{color:var(--ok)}.hwc .feat s{color:var(--danger);text-decoration:none}
+.hwc.match{border-color:var(--ok);box-shadow:0 0 14px rgba(123,200,108,.3)}
+.hwc.nomatch{opacity:.55;border-color:var(--danger)}
+.hwc.wrong{animation:shake .3s;border-color:var(--danger)}
+
+/* ==== 혈액형 판정 ==== */
+.serum{display:flex;gap:12px;justify-content:center;margin:12px 0}
+.serum .tube{border:1px solid var(--line);border-radius:12px;background:#0c0904;padding:12px 16px;text-align:center;min-width:120px}
+.serum .drop{width:44px;height:44px;border-radius:50%;margin:8px auto;border:1px solid rgba(255,255,255,.15);
+  background:radial-gradient(circle at 35% 30%,#ff8873,#a02818)}
+.serum .drop.clump{background:radial-gradient(circle at 35% 30%,#7a1408 20%,#a02818 21%,#5c0f05 40%,#a02818 41%,#701206 62%,#96261a 63%)}
+.serum .tl{font-size:12px;font-family:var(--fontm);color:var(--muted)}
+.serum .tr{font-size:12.5px;font-weight:800}
+.serum .tr.o{color:var(--danger)}.serum .tr.x{color:var(--muted)}
+
+/* ==== DNA 전기영동 ==== */
+.gel-run{position:relative;border:1px solid var(--line);border-radius:12px;background:#07131a;
+  padding:14px;margin:10px 0;text-align:center}
+.gel-note{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ==== 금고 힌트 ==== */
+.safe-hints{margin-top:10px;text-align:left;font-size:12.5px;line-height:1.7;color:var(--muted)}
+.safe-hints .sh{display:block;padding:8px 10px;border-left:3px solid var(--gold-soft);
+  background:rgba(232,176,75,.06);border-radius:0 8px 8px 0;margin-top:6px;animation:fade .4s}
+.safe-hints .sh b{color:var(--gold)}
+
+/* ==== 수사 수첩 ==== */
+.nb-fab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--gold-soft);
+  color:var(--gold);font-weight:800;font-size:14px;padding:12px 18px;border-radius:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);transition:.15s}
+.nb-fab:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(232,176,75,.25)}
+.nb-tip{font-size:12.5px;color:var(--muted);line-height:1.65;margin:8px 0 14px;
+  padding:10px 12px;border-left:3px solid var(--gold-soft);background:rgba(232,176,75,.05);border-radius:0 8px 8px 0}
+.nb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.nb-row img{width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:top center;border:1px solid var(--line)}
+.nb-row .nb-nm{font-weight:800;font-size:14px;width:64px}
+.nb-dots{display:flex;gap:6px;margin-left:auto}
+.nb-dots i{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);cursor:pointer;transition:.12s;display:block}
+.nb-dots i:hover{border-color:var(--danger)}
+.nb-dots i.on{background:var(--danger);border-color:var(--danger);box-shadow:0 0 8px rgba(224,96,74,.5)}
+.nb-lb{font-size:11px;color:var(--muted);font-family:var(--fontm)}
+.nb-memo{width:100%;min-height:74px;margin-top:12px;background:#0c0904;border:1px solid var(--line);
+  border-radius:10px;color:var(--ink);font-family:var(--fontd);font-size:13.5px;padding:10px 12px;resize:vertical}
+.nb-memo:focus{outline:none;border-color:var(--gold-soft)}
+.share-box{margin-top:16px;padding:14px;border:1px dashed var(--gold-soft);border-radius:12px;
+  background:rgba(232,176,75,.05);text-align:left;font-size:13px;line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto}
 </style>
 </head>
 <body>
@@ -473,7 +547,7 @@ h1,h2,h3,p{margin:0}
   <div class="stats">
     <div class="stat hl"><div class="lb">사건번호</div><div class="vl mono">SOLOMON-2026</div></div>
     <div class="stat"><div class="lb">수집한 증거</div><div class="vl"><span id="evCount">0</span> / 7</div></div>
-    <div class="stat"><div class="lb">감식 실험</div><div class="vl"><span id="expCount">0</span> / 1</div></div>
+    <div class="stat"><div class="lb">감식 실험</div><div class="vl"><span id="expCount">0</span> / 4</div></div>
   </div>
 </div>
 
@@ -528,11 +602,12 @@ h1,h2,h3,p{margin:0}
 
 <!-- ===================== 2. 과학 수사 ===================== -->
 <section class="page" id="lab">
-  <p class="lead">이제 직접 <b>과학수사관</b>이 되어 결정적 증거인 <b>지문</b>을 감식할 차례예요.
-  커피잔의 지문을 <b>직접 채취</b>하고 용의자와 <b>대조</b>해서 진범을 밝혀내세요.</p>
+  <p class="lead">이제 직접 <b>과학수사관</b>이 되어 감식 실험 <b>4종</b>을 수행하세요.
+  <b>필적 → 혈흔 → DNA</b> 순서로 조사하고, 결정적 증거인 <b>지문 감식</b>은 마지막에 열려요.
+  각 실험은 용의자를 <b>좁혀줄 뿐</b>, 범인을 바로 알려주지 않아요 — 수사 수첩에 기록하며 스스로 추리하세요.</p>
   <div id="labList"></div>
   <div class="center mt2">
-    <button class="btn ai" id="toAi" disabled>지문 감식을 끝내면 → AI 분석</button>
+    <button class="btn ai" id="toAi" disabled>감식 4종을 모두 끝내면 → AI 분석</button>
   </div>
 </section>
 
@@ -555,10 +630,12 @@ h1,h2,h3,p{margin:0}
           id="verdictText"></div>
         <!-- 금고 -->
         <div class="safe">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:6px">🔒 진범이 USB를 숨긴 금고. <b style="color:var(--gold)">지문 감식 리포트</b>에서 확인한 암호 4자리를 직접 입력하세요.</p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:6px">🔒 진범이 USB를 숨긴 금고. 암호는 어디에도 적혀 있지 않아요.
+          <b style="color:var(--gold)">현장에서 본 단서들</b>(닳은 키패드 · 찢어진 메모 · 노트북 기록)을 조합해 네 자리를 직접 유추하세요.</p>
           <div class="code-disp" id="codeDisp"></div>
           <div class="pad" id="pad"></div>
           <div class="safe-msg" id="safeMsg"></div>
+          <div class="safe-hints" id="safeHints"></div>
         </div>
       </div>
     </div>
@@ -613,6 +690,11 @@ h1,h2,h3,p{margin:0}
       · 법을 어기고 모은 증거는 쓸 수 없다 — <b style="color:var(--gold)">위법수집증거 배제 · 영장주의</b><br>
       · <b style="color:var(--gold)">무죄추정의 원칙</b> — 판결이 나기 전까지는 누구도 범인이 아니다</p>
     </div>
+    <div class="share-box">
+      <b style="color:var(--gold)">🕵️ 나의 추리 카드</b>
+      <div id="shareView" style="margin-top:8px;font-family:var(--fontm);font-size:12.5px"></div>
+      <div class="center mt"><button class="btn ai" id="copyShare">📋 추리 카드 복사 — 친구와 비교하기</button></div>
+    </div>
     <button class="btn ghost mt" id="restart">처음부터 다시 하기 ↺</button>
   </div>
 </section>
@@ -630,6 +712,18 @@ h1,h2,h3,p{margin:0}
     </div>
     <div class="dlg-clue" id="dlgClue"></div>
     <div class="dlg-foot"><span class="dlg-dots" id="dlgDots"></span><button class="btn dlg-next" id="dlgNext">다음 ▶</button></div>
+  </div>
+</div>
+<!-- 수사 수첩 -->
+<button class="nb-fab" id="nbFab">🗒️ <span>수사 수첩</span></button>
+<div class="dlg-bg" id="nbBg">
+  <div class="dlg">
+    <button class="x" id="nbX">✕</button>
+    <div class="dlg-head">🗒️ 나의 수사 수첩</div>
+    <p class="nb-tip">단서를 볼 때마다 <b>스스로</b> 용의자별 의심도를 조절하고, 그렇게 생각한 <b>근거</b>를 메모하세요.
+    앱은 정답을 미리 알려주지 않아요 — 이건 여러분의 추리입니다. 수사가 끝나면 <b>추리 카드</b>로 만들어 친구와 비교해 보세요!</p>
+    <div id="nbList"></div>
+    <textarea class="nb-memo" id="nbMemo" placeholder="추리 메모 — 누구를, 왜 의심하나요? 근거를 적어 보세요."></textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -656,77 +750,74 @@ const HEAD={laptop:'💻 노트북 · 접속 기록',safe:'🔒 금고 · 잠긴
 const STORY={
  laptop:[
   {s:null,t:'법정 노트북이 아직 켜져 있다. 마지막 접속 기록을 확인한다.'},
-  {s:null,t:'[기록] 밤 11시 47분 — "USB 증거파일"이 열렸습니다.'},
-  {s:null,t:'그날 USB를 가장 먼저 열어본 사람은… 변호사 강도훈이었다.'},
-  {s:'dohoon',t:'…그 파일만 없었으면, 오늘 재판은 내가 이기는 거였어.'}
+  {s:null,t:'[기록] 밤 11시 47분 — "USB 증거파일"이 열렸습니다. 계정: 법정 공용 계정.'},
+  {s:null,t:'공용 계정이라 네 명 모두 비밀번호를 안다. 이 기록만으로는 누가 열었는지 알 수 없다.'},
+  {s:'junhyeok',t:'로그 몇 줄이 지워진 흔적이 있네요. …로그를 지울 줄 아는 사람의 소행이겠죠?'}
  ],
  safe:[
   {s:null,t:'책상 위 작은 금고. USB는 이 안에 숨겨진 것 같다. 잠겨 있다.'},
-  {s:null,t:'키패드 몇몇 숫자만 유난히 반질반질 닳아 있다. 누군가 자주 눌러 온 흔적이다.'},
-  {s:'seoyeon',t:'그 금고 비밀번호… 원래 저만 알아요. 누가 알아냈나 봐요.'},
-  {s:null,t:'정서연만 아는 번호였다는데, 범인은 대체 어떻게 알았을까?'}
+  {s:null,t:'자세히 보니 키패드에서 유독 <1> <4> <7> 세 숫자만 반질반질 닳아 있다.'},
+  {s:'seoyeon',t:'비밀번호는 원래 저만 알아요. 관장님이 자꾸 잊으셔서… 기억하기 쉬운 "어떤 시각"으로 바꿔 드렸거든요.'},
+  {s:null,t:'암호는 네 자리, 닳은 숫자는 세 개뿐. 그렇다면 어느 한 숫자는 두 번 눌린다는 뜻이다.'}
  ],
  mug:[
   {s:null,t:'아직 온기가 남은 커피잔. 가장자리에 선명한 지문이 찍혀 있다.'},
+  {s:null,t:'네 명 모두 오늘 이 방에서 커피를 마셨다고 한다. 이 잔의 주인은 누구일까.'},
   {s:null,t:'지문을 조심스럽게 채취해 실험실로 보낸다. (→ 과학수사: 지문 감식)'}
  ],
  trash:[
   {s:null,t:'휴지통에서 구겨진 증거 목록을 펴 본다.'},
-  {s:null,t:'강도훈에게 불리한 항목만 골라 지워지고 찢겨 있다.'},
-  {s:'dohoon',t:'증거? …그런 건 처음부터 없었던 걸로 하면 그만이지.'}
+  {s:null,t:'목록의 일부 항목이 찢겨 나가 있다. 어떤 증거가 사라졌는지는 알 수 없다.'},
+  {s:'cheolung',t:'쓰레기통은 원래 내가 밤마다 비우는데… 어젯밤엔 못 비웠어. 나 말고도 드나든 사람이 있단 얘기지.'},
+  {s:null,t:'증거가 사라져서 이득을 보는 사람 — 그게 범인의 동기다. 하지만 그게 누구인지는 아직 모른다.'}
  ],
  jacket:[
   {s:null,t:'의자에 걸린 낡은 가죽 자켓. 경위 박철웅의 것이다.'},
   {s:null,t:'주머니에서 빚 독촉장이 나온다.'},
   {s:'cheolung',t:'…돈이 급했던 건 맞아. 근데 그 USB엔 손도 안 댔어. 정말이야.'},
-  {s:null,t:'자켓엔 머리카락도 한 올 붙어 있다. 함정일까? (→ 과학수사: DNA 분석)'}
+  {s:null,t:'자켓엔 머리카락도 한 올 붙어 있다. 의심스럽다. 하지만 느낌만으로 단정할 수는 없다. (→ 과학수사: DNA 분석)'}
  ],
  note:[
   {s:null,t:'바닥에 떨어진 찢어진 메모. 급하게 갈겨쓴 글씨다.'},
-  {s:null,t:'"USB를 열어본 사람이… 가장 먼저 의심받는다."'},
-  {s:'junhyeok',t:'전 방청석에 있었을 뿐이에요. …근데 저 노트북 로그, 뭔가 손댄 흔적이 있던데요?'},
-  {s:null,t:'오른손잡이 특유의 글씨체. 필적 감정이 필요하다. (→ 과학수사: 필적 감정)'}
+  {s:null,t:'"먼저 열어본 사람이 먼저 의심받는다. — 그 시각이 열쇠다."'},
+  {s:null,t:'"그 시각이 열쇠다"… 범인이 무언가를 잠글 때 시각을 썼다는 뜻일까?'},
+  {s:null,t:'글씨가 오른쪽 위로 힘있게 뻗어 있다. 누구의 글씨인지 필적 감정이 필요하다. (→ 과학수사: 필적 감정)'}
  ],
  file:[
-  {s:null,t:'"기밀 — 사건 자료 문서". 용의자 4명의 프로필이 들어 있다.'},
-  {s:'dohoon',t:'강도훈(37). 검사 출신 변호사. USB를 가장 먼저 열람. 이기기 위해선 수단·방법을 안 가린다.'},
-  {s:'seoyeon',t:'정서연(29). 법정 속기사. 금고 비밀번호를 안다. 조용하지만 비밀이 많아 보인다.'},
-  {s:'cheolung',t:'박철웅(45). 법원 경위. 출입·보안 담당. 요즘 돈 문제로 힘들어한다.'},
-  {s:'junhyeok',t:'이준혁(25). 법학과 대학원생. 해킹 실력이 뛰어나고, 이 사건에 관심이 유난히 많다.'}
+  {s:null,t:'"기밀 — 사건 자료 문서". 용의자 4명의 프로필이 들어 있다. 놀랍게도, 네 명 모두 동기가 있다.'},
+  {s:'dohoon',t:'강도훈(37). 검사 출신 변호사. 이번 재판에서 지면 경력이 끝난다. 그날 밤 늦게까지 법정에 남아 있었다.'},
+  {s:'seoyeon',t:'정서연(29). 법정 속기사. 금고 비밀번호를 아는 유일한 사람. 최근 강도훈과 크게 다퉜다.'},
+  {s:'cheolung',t:'박철웅(45). 법원 경위. 야간 출입 열쇠를 관리한다. 빚 독촉에 시달리고 있다.'},
+  {s:'junhyeok',t:'이준혁(25). 법학과 대학원생. 보안 로그를 다룰 줄 알고, 이 사건에 유난히 집착한다.'}
  ]
 };
 const CLUE_SUM={
- laptop:'<b>단서:</b> 강도훈이 USB를 <b>가장 먼저 열람</b>. 열린 시각 <b>11:47</b>.',
- safe:'<b>단서:</b> USB는 이 금고 안에 있어요! 금고 암호는 <b>지문 감식 실험</b>을 끝내면 감식 리포트에 나타나요.',
- mug:'<b>단서:</b> 커피잔에서 <b>지문 확보</b>. → 지문 감식으로 대조!',
- trash:'<b>단서:</b> 증거가 사라지면 <b>강도훈에게 유리</b>해진다. (동기 발견)',
- jacket:'<b>함정 단서:</b> 박철웅은 돈 문제 + 현장에 있었다. 하지만 정말 범인일까? 머리카락은 DNA로 확인!',
- note:'<b>단서:</b> 범인은 <b>오른손잡이</b>이고 <b>USB를 열어본 사람</b>. → 필적 감정!',
- file:'<b>단서:</b> 용의자 4명 확보! 실험 결과와 맞춰 진범을 좁혀보자.'
+ laptop:'<b>단서:</b> USB가 <b>밤 11시 47분</b>에 열렸다. 공용 계정 — <b>누가</b> 열었는지는 아직 모른다.',
+ safe:'<b>단서:</b> USB는 이 금고 안에! 키패드는 <b>1 · 4 · 7</b>만 닳아 있고, 암호는 기억하기 쉬운 <b>"어떤 시각"</b>이라고 한다.',
+ mug:'<b>단서:</b> 커피잔에서 <b>지문 확보</b>. 잔의 주인은 아직 모른다. → 지문 감식으로 대조!',
+ trash:'<b>단서:</b> 증거 목록 일부가 찢겨 사라졌다. <b>증거가 사라져 이득을 보는 사람</b>은 누구일까?',
+ jacket:'<b>단서:</b> 박철웅은 돈 문제 + 현장에 흔적. 의심스럽다… 하지만 <b>느낌이 아니라 증거</b>로 확인해야 한다. → DNA 분석!',
+ note:'<b>단서:</b> "그 시각이 열쇠다" — 금고 암호의 힌트? 글씨의 주인은 <b>필적 감정</b>으로!',
+ file:'<b>단서:</b> 용의자 4명 <b>전원에게 동기</b>가 있다. 과학수사로 하나씩 좁혀 나가자.'
 };
 const CLUE_ORDER=['laptop','safe','mug','trash','jacket','note','file'];
 
-/* 실험: 정답 index / 나오는 숫자 / 설명 */
-const EXPERIMENTS=[
- {id:'print',tag:'실험 1 · 지문 감식',icon:'☝️',
-  q:'커피잔에서 나온 지문과 일치하는 용의자를 고르세요. (힌트: USB를 가장 먼저 열어본 사람)',
-  samples:[['강도훈','whorl'],['정서연','loop'],['박철웅','arch'],['이준혁','tent']],
-  answer:0,digit:'1',
-  win:'지문 일치! 커피잔 지문 = <b>강도훈</b>의 와상문(소용돌이형) 지문. <span class="digit">암호 첫자리 = 1</span>'},
- {id:'luminol',tag:'실험 2 · 루미놀 혈흔 반응',icon:'🔦',
-  q:'책상 얼룩에 루미놀을 뿌려 진짜 혈흔인지 확인하세요.',
-  special:'luminol',digit:'1',
-  win:'파랗게 빛나요! 진짜 혈흔이에요. 검출된 혈액형은 <b>A형</b> — 강도훈과 일치(서류를 찢다 종이에 베인 상처). <span class="digit">암호 둘째자리 = 1</span>'},
- {id:'hand',tag:'실험 3 · 필적 감정',icon:'✍️',
-  q:'찢어진 메모의 글씨(오른손잡이 필체)와 일치하는 용의자는?',
-  samples:[['정서연','left'],['박철웅','wide'],['강도훈','right'],['이준혁','vert']],
-  answer:2,digit:'4',
-  win:'필적 일치! 메모 글씨 = <b>강도훈</b>의 오른손잡이 필체. <span class="digit">암호 셋째자리 = 4</span>'},
- {id:'dna',tag:'실험 4 · DNA(머리카락) 분석',icon:'🧬',
-  q:'자켓에서 나온 머리카락의 DNA는 누구의 것일까요?',
-  samples:[['강도훈','a'],['정서연','b'],['이준혁','c'],['박철웅','d']],
-  answer:3,digit:'7',
-  win:'머리카락은 <b>박철웅</b>의 것! 하지만 박철웅은 지문·혈액형·필적이 <b>모두 안 맞아요</b>. 현장에 있었어도 범인은 아니다 — 이게 과학수사의 핵심! <span class="digit">암호 넷째자리 = 7</span>'}
+/* 필적 감정: 관찰 포인트 3가지 + 용의자 필적 샘플 */
+const HW_POINTS=[
+ {ico:'↗️',q:'글줄의 기울기',a:'글줄이 오른쪽 위로 올라간다 → <b>오른손잡이</b>가 급히 쓴 글씨의 특징'},
+ {ico:'🖊️',q:'획 끝의 삐침',a:'획 끝이 꾹 눌려 끊긴다 → <b>필압(누르는 힘)이 강한</b> 사람'},
+ {ico:'📏',q:'글자 사이 간격',a:'자간이 좁고 불규칙하다 → 몹시 <b>서두르며</b> 쓴 글씨'}
+];
+const HW_SAMPLES=[
+ {id:'dohoon',nm:'강도훈',kind:'right',f:[true,true,true]},
+ {id:'seoyeon',nm:'정서연',kind:'left',f:[false,false,true]},
+ {id:'cheolung',nm:'박철웅',kind:'wide',f:[true,true,true]},
+ {id:'junhyeok',nm:'이준혁',kind:'vert',f:[false,true,false]}
+];
+const HW_FEAT_LB=['기울기(오른손)','필압(강함)','자간(급함)'];
+/* DNA 전기영동: 시료 밴드 = 박철웅(d) */
+const DNA_SAMPLES=[
+ {nm:'강도훈',kind:'a'},{nm:'정서연',kind:'b'},{nm:'이준혁',kind:'c'},{nm:'박철웅',kind:'d'}
 ];
 
 const SUSPECTS=[
@@ -851,9 +942,66 @@ const LIFT_PTS=[[20,15],[46,28],[30,42]];
 function buildLab(){
   const box=$('#labList');
   box.innerHTML=`
-   <div class="exp" id="exp-print">
-     <span class="tag">지문 감식 실험 · 직접 조작</span>
+   <div class="exp" id="exp-hand">
+     <span class="tag">실험 1 · 필적 감정 · 직접 조작</span>
+     <h3 style="margin:2px 0 8px">✍️ 찢어진 메모 — 누구의 글씨인가</h3>
+     <div class="lab-step" id="hstep1">
+       <div class="lab-step-h"><b>STEP 1 · 관찰</b> — 메모를 자세히 보고, 아래 <b>관찰 포인트 3가지</b>를 눌러 필적 특징을 찾아내세요</div>
+       <div class="memo-paper">
+         <span class="ml">"먼저 열어본 사람이</span>
+         <span class="ml">먼저 의심받는다."</span>
+         <span class="ml small">— 그 시각이 열쇠다</span>
+       </div>
+       <div class="hw-points" id="hwPoints"></div>
+     </div>
+     <div class="lab-step locked" id="hstep2">
+       <div class="lab-step-h"><b>STEP 2 · 대조</b> — 용의자 4명의 필적 샘플을 하나씩 <b>🔍 대조</b>한 뒤, 특징 3가지가 <b>모두 일치하는 사람들</b>을 골라내세요</div>
+       <div class="samples" id="hwWrap"></div>
+       <div class="result" id="res-hand"></div>
+     </div>
+   </div>
+
+   <div class="exp" id="exp-blood">
+     <span class="tag">실험 2 · 루미놀 & 혈액형 판정 · 직접 조작</span>
+     <h3 style="margin:2px 0 8px">🩸 책상 얼룩의 정체를 밝혀라</h3>
+     <div class="lab-step" id="bstep1">
+       <div class="lab-step-h"><b>STEP 1 · 루미놀 반응</b> — 불을 끄고, 루미놀 용액을 얼룩에 골고루 분무하세요</div>
+       <div class="luminol" id="lumiBox"><div class="glow"></div><span id="lumiLb" style="font-size:13px;color:var(--muted);position:relative">🖥️ 책상 위 수상한 얼룩…</span></div>
+       <div class="gauge"><div class="gauge-fill" id="lumiFill"></div></div>
+       <button class="btn ghost" id="lumiBtn" onclick="spray()">🧴 루미놀 분무하기</button>
+     </div>
+     <div class="lab-step locked" id="bstep2">
+       <div class="lab-step-h"><b>STEP 2 · 혈액형 판정</b> — 혈청 반응 결과를 보고 혈액형을 직접 판정하세요 (응집 = 피가 덩어리짐)</div>
+       <div class="serum">
+         <div class="tube"><div class="tl">항-A 혈청</div><div class="drop clump"></div><div class="tr o">응집 O</div></div>
+         <div class="tube"><div class="tl">항-B 혈청</div><div class="drop"></div><div class="tr x">응집 X</div></div>
+       </div>
+       <div class="samples" id="bloodWrap"></div>
+       <div class="result" id="res-blood"></div>
+     </div>
+   </div>
+
+   <div class="exp" id="exp-dna">
+     <span class="tag">실험 3 · DNA 전기영동 · 직접 조작</span>
+     <h3 style="margin:2px 0 8px">🧬 자켓의 머리카락 — 주인은 누구인가</h3>
+     <div class="lab-step" id="dstep1">
+       <div class="lab-step-h"><b>STEP 1 · 전기영동</b> — 머리카락에서 뽑은 DNA를 장치에 걸어 밴드(줄무늬)를 만드세요</div>
+       <div class="gel-run" id="gelRun"><span style="font-size:13px;color:var(--muted)">🧪 시료 준비 완료 — 전기를 걸면 DNA 조각이 크기별로 갈라져요</span></div>
+       <button class="btn ghost" id="gelBtn" onclick="runGel()">⚡ 전기영동 시작</button>
+     </div>
+     <div class="lab-step locked" id="dstep2">
+       <div class="lab-step-h"><b>STEP 2 · 밴드 대조</b> — 시료의 밴드 무늬와 <b>완전히 같은</b> 용의자를 고르세요</div>
+       <div class="samples" id="dnaWrap"></div>
+       <div class="result" id="res-dna"></div>
+     </div>
+   </div>
+
+   <div class="exp exp-locked" id="exp-print">
+     <span class="tag">실험 4 · 지문 감식 · 결정적 증거</span>
      <h3 style="margin:2px 0 8px">☝️ 커피잔에서 진범의 지문을 감식하라</h3>
+     <div class="exp-lockmsg" id="printLock">🔒 실험 1 ~ 3을 모두 끝내면 열려요 — 지문은 마지막 결정타!</div>
+     <p class="minu-note">🧪 <b>실물 실험 연계</b> — 오늘 수업에서 직접 채취한 지문을 떠올리며 진행하세요. 이 절차(가루 → 전사 → 문양 분류 → 특징점 대조)는 실제 감식 절차와 같아요.</p>
+     <div class="exp-body">
      <div class="lab-step" id="step1">
        <div class="lab-step-h"><b>STEP 1 · 채취</b> — 지문 가루를 발라 잠재 지문을 드러내고, 테이프로 전사하세요</div>
        <div class="dust-zone">
@@ -878,6 +1026,7 @@ function buildLab(){
        <div class="samples" id="candWrap"></div>
        <div class="result" id="res-print"></div>
      </div>
+     </div>
    </div>`;
   const CLS=[['궁상문','산처럼 완만한 곡선','arch'],['제상문','한쪽으로 흐르는 고리','loop'],['와상문','중심을 도는 소용돌이','whorl']];
   const cw=$('#classWrap');
@@ -887,6 +1036,147 @@ function buildLab(){
     d.onclick=()=>classify(i);
     cw.appendChild(d);
   });
+  buildHwPoints(); buildBloodOpts(); buildDnaOpts();
+}
+
+/* ----- 실험 1 · 필적 감정 ----- */
+let hwFoundN=0, hwInspected=[false,false,false,false];
+const hwPicked=new Set();
+function buildHwPoints(){
+  const w=$('#hwPoints'); w.innerHTML='';
+  HW_POINTS.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='hw-point';
+    d.innerHTML='<div class="hp-ico">'+p.ico+'</div><div class="hp-q">'+p.q+'</div><div class="hp-a">'+p.a+'</div>';
+    d.onclick=()=>{
+      if(d.classList.contains('found'))return;
+      d.classList.add('found'); hwFoundN++;
+      if(hwFoundN===HW_POINTS.length){
+        $('#hstep2').classList.remove('locked'); buildHwSamples();
+        toast('특징 3가지 확보! 용의자 필적과 대조하세요');
+      }
+    };
+    w.appendChild(d);
+  });
+}
+function buildHwSamples(){
+  const w=$('#hwWrap'); w.innerHTML='';
+  HW_SAMPLES.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='hwc'; d.id='hwc-'+i;
+    d.innerHTML='<div>'+fingerprint(s.kind)+'</div><div style="font-weight:800;font-size:13px">'+s.nm+'</div>'+
+      '<div class="feat" id="hwf-'+i+'">— 아직 대조 전 —</div>'+
+      '<button class="btn ghost cbtn" onclick="inspectHw('+i+')">🔍 특징 대조</button>'+
+      '<button class="btn cbtn" id="hwpick-'+i+'" onclick="pickHw('+i+')" disabled>일치로 표시</button>';
+    w.appendChild(d);
+  });
+}
+window.inspectHw=function(i){
+  const s=HW_SAMPLES[i];
+  $('#hwf-'+i).innerHTML=s.f.map((m,k)=>(m?'<b>✓ ':'<s>✗ ')+HW_FEAT_LB[k]+(m?'</b>':'</s>')).join('<br>');
+  hwInspected[i]=true; $('#hwpick-'+i).disabled=false;
+};
+window.pickHw=function(i){
+  if(S.exps.has('hand'))return;
+  if(!hwInspected[i]){ toast('먼저 🔍 특징 대조로 확인하세요'); return; }
+  const s=HW_SAMPLES[i], el=$('#hwc-'+i), r=$('#res-hand');
+  if(s.f.every(Boolean)){
+    el.classList.add('match'); $('#hwpick-'+i).disabled=true; hwPicked.add(i);
+    if(hwPicked.size===2){
+      HW_SAMPLES.forEach((x,k)=>{ if(!x.f.every(Boolean)) $('#hwc-'+k).classList.add('nomatch'); });
+      r.className='result ok show';
+      r.innerHTML='✅ <b>감정 결과 — 특징 3가지가 모두 일치하는 사람은 2명: 강도훈 · 박철웅.</b><br>필적만으로는 한 명으로 좁힐 수 없어요. 다른 증거와의 <b>교차 확인</b>이 필요합니다. 수사 수첩에 기록해 두세요!';
+      labDone('hand','exp-hand');
+    }else{
+      r.className='result show';
+      r.innerHTML='☑️ 1명 표시! 특징이 모두 일치하는 사람이 <b>한 명 더</b> 있어요. 나머지 샘플도 대조해 보세요.';
+    }
+  }else{
+    el.classList.add('wrong'); setTimeout(()=>el.classList.remove('wrong'),400);
+    r.className='result show';
+    r.innerHTML='❌ <b>'+s.nm+'</b>의 필적은 특징이 어긋나요(✗ 표시). 특징 3가지가 <b>전부 ✓</b>인 사람만 일치예요.';
+  }
+};
+
+/* ----- 실험 2 · 루미놀 & 혈액형 ----- */
+let sprayN=0;
+window.spray=function(){
+  if(sprayN>=3)return; sprayN++;
+  $('#lumiFill').style.width=(sprayN*34)+'%';
+  if(sprayN===3){
+    $('#lumiBox').classList.add('on'); $('#lumiLb').textContent='';
+    $('#lumiBtn').disabled=true; $('#lumiBtn').textContent='🧴 분무 완료 ✓';
+    setTimeout(()=>{ $('#bstep2').classList.remove('locked'); toast('청백색 발광 — 진짜 혈흔! 혈액형을 판정하세요'); },900);
+  }
+};
+function buildBloodOpts(){
+  const w=$('#bloodWrap'); w.innerHTML='';
+  ['A형','B형','AB형','O형'].forEach((t,i)=>{
+    const d=document.createElement('div'); d.className='sample';
+    d.innerHTML='<div style="font-size:26px">🩸</div><div class="nm" style="font-weight:800;color:var(--ink)">'+t+'</div>';
+    d.onclick=()=>pickBlood(i,d);
+    w.appendChild(d);
+  });
+}
+function pickBlood(i,el){
+  if(S.exps.has('blood'))return;
+  const r=$('#res-blood');
+  if(i===0){
+    el.classList.add('right'); r.className='result ok show';
+    r.innerHTML='✅ <b>A형!</b> 항-A 혈청에서만 응집이 일어나면 A형이에요.<br>용의자 중 A형은 <b>강도훈 · 정서연</b> 2명 — 혈액형만으로는 결정할 수 없어요. 수첩에 기록!';
+    labDone('blood','exp-blood');
+  }else{
+    el.classList.add('wrong'); setTimeout(()=>el.classList.remove('wrong'),400);
+    r.className='result show';
+    r.innerHTML='❌ 다시 보세요 — <b>어느 혈청에서 응집이 일어났는지</b>가 핵심이에요. (항-A: 응집 O / 항-B: 응집 X)';
+  }
+}
+
+/* ----- 실험 3 · DNA 전기영동 ----- */
+let gelDone=false;
+window.runGel=function(){
+  if(gelDone)return; gelDone=true;
+  $('#gelBtn').disabled=true; $('#gelBtn').textContent='⚡ 영동 완료 ✓';
+  $('#gelRun').innerHTML='<span class="lifted-lb">시료(머리카락)의 DNA 밴드</span><div>'+fingerprint('d',null,true)+'</div>'+
+    '<div class="gel-note">DNA 조각이 크기별로 갈라져 사람마다 다른 줄무늬를 만들어요 — DNA 지문!</div>';
+  $('#dstep2').classList.remove('locked');
+  toast('밴드 완성! 용의자의 밴드와 대조하세요');
+};
+function buildDnaOpts(){
+  const w=$('#dnaWrap'); w.innerHTML='';
+  DNA_SAMPLES.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='sample';
+    d.innerHTML='<div>'+fingerprint(s.kind)+'</div><div class="nm" style="font-weight:800;color:var(--ink)">'+s.nm+'</div>';
+    d.onclick=()=>pickDna(i,d);
+    w.appendChild(d);
+  });
+}
+function pickDna(i,el){
+  if(S.exps.has('dna'))return;
+  const r=$('#res-dna');
+  if(DNA_SAMPLES[i].nm==='박철웅'){
+    el.classList.add('right'); r.className='result ok show';
+    r.innerHTML='✅ 밴드 일치 — 머리카락은 <b>박철웅</b>의 것!<br>⚠️ 하지만 잠깐. <b>현장에 있었다는 것</b>과 <b>범인이라는 것</b>은 달라요. 박철웅은 매일 이 방을 순찰해요. 다른 증거와 교차 확인 없이는 단정 금지 — 이게 과학수사의 핵심!';
+    labDone('dna','exp-dna');
+  }else{
+    el.classList.add('wrong'); setTimeout(()=>el.classList.remove('wrong'),400);
+    r.className='result show';
+    r.innerHTML='❌ 밴드의 줄 개수와 위치가 시료와 달라요. <b>완전히 같은 무늬</b>를 찾으세요.';
+  }
+}
+
+/* ----- 실험 완료 처리 & 지문 실험 개방 ----- */
+function labDone(id,expEl){
+  if(S.exps.has(id))return;
+  S.exps.add(id);
+  $('#'+expEl).classList.add('done');
+  $('#expCount').textContent=S.exps.size;
+  if(['hand','blood','dna'].every(k=>S.exps.has(k)) && $('#exp-print').classList.contains('exp-locked')){
+    $('#exp-print').classList.remove('exp-locked');
+    const pl=$('#printLock');
+    pl.textContent='🔓 지문 감식 개방! 결정적 증거를 확보하세요.';
+    pl.style.color='var(--ok)';
+    toast('🔓 실험 4 · 지문 감식이 열렸어요!');
+  }
+  if(S.exps.size===4){ $('#toAi').disabled=false; markTabDone(1); }
 }
 window.dust=function(){
   if(taped||dustN>=5)return;
@@ -962,24 +1252,21 @@ window.pickCand=function(ci){
 };
 function finishLab(){
   if(S.exps.has('print'))return;
-  S.exps.add('print');
-  $('#exp-print').classList.add('done');
-  $('#expCount').textContent=S.exps.size;
   const r=$('#res-print'); r.className='result ok show';
-  r.innerHTML=`✅ <b>특징점 3개 모두 일치 — 강도훈!</b> (실무 기준은 12개 이상 일치)
+  r.innerHTML=`✅ <b>특징점 3개 모두 일치 — 커피잔의 지문은 강도훈의 것!</b> (실무 기준은 12개 이상 일치)
    <div class="lreport">
      <div class="lreport-h">🧾 국립과학수사 · 감식 리포트</div>
      <table class="lreport-t">
-       <tr><td>지문 (커피잔)</td><td>와상문·특징점 → <b>강도훈</b></td><td class="cd">1</td></tr>
-       <tr><td>혈액형 (혈흔)</td><td>A형 → 강도훈·정서연 (2명)</td><td class="cd">1</td></tr>
-       <tr><td>필적 (메모)</td><td>오른손잡이 → 강도훈·박철웅 (2명)</td><td class="cd">4</td></tr>
-       <tr><td>동기 (문서)</td><td>USB 최초 열람</td><td class="cd">7</td></tr>
+       <tr><td>✍️ 필적 (메모)</td><td>오른손·강한 필압 → <b>강도훈 · 박철웅</b> (2명)</td></tr>
+       <tr><td>🩸 혈액형 (혈흔)</td><td>A형 → <b>강도훈 · 정서연</b> (2명)</td></tr>
+       <tr><td>🧬 DNA (머리카락)</td><td><b>박철웅</b> — 현장 체류 확인 (범인 단정 불가)</td></tr>
+       <tr><td>☝️ 지문 (커피잔)</td><td>와상문 → 강도훈·이준혁, 특징점 → <b>강도훈</b></td></tr>
      </table>
-     <div class="lreport-note">혈액형·필적만으로는 용의자가 각각 <b>2명</b>! 세 증거가 <b>공통으로 가리키는 한 사람</b>은 누구일까요? — 다음 <b>AI 분석</b>에서 직접 지목합니다.</div>
-     <div class="lreport-code">🔓 금고 암호 = 위 <b>암호</b> 칸의 숫자 네 개를 <b>순서대로</b> 금고에 눌러 입력하세요</div>
+     <div class="lreport-note">각 증거는 용의자를 <b>좁혀줄 뿐</b>, 혼자서는 범인을 정하지 못해요. 여러 증거가 <b>공통으로 가리키는 한 사람</b>은 누구일까요? — 다음 <b>AI 분석</b>에서 직접 지목합니다.</div>
+     <div class="lreport-code">🔒 금고 암호는 이 리포트에 <b>없습니다</b>. 현장 단서 — <b>닳은 키패드 숫자</b> · 메모의 <b>"그 시각이 열쇠다"</b> · <b>노트북 접속 기록</b> — 을 조합해 직접 유추하세요!</div>
    </div>`;
-  $('#toAi').disabled=false; markTabDone(1);
-  toast('감식 완료! AI 분석 → 금고 암호를 직접 입력하세요');
+  labDone('print','exp-print');
+  toast('감식 4종 완료! AI 분석으로');
 }
 $('#toAi').addEventListener('click',()=>go('ai'));
 
@@ -1038,6 +1325,7 @@ window.accuse=function(id){
     setTimeout(()=>$('#aiVerdict').scrollIntoView({behavior:'smooth'}),200);
     toast('진범 지목 성공! 금고 암호를 입력하세요');
   }else{
+    S.wrongAccuse=(S.wrongAccuse||0)+1;
     const el=$('#susp-'+id); el.classList.add('cleared'); setTimeout(()=>el.classList.remove('cleared'),550);
     ah.innerHTML='❌ <b>'+s.nm+'</b>은(는) 진범이 아니에요. '+s.clear+'<br>👉 <b>세 증거가 모두 겹치는</b> 사람을 다시 찾아 클릭하세요.';
   }
@@ -1056,15 +1344,21 @@ function press(k){
   if(k==='✓'){ checkCode(cur); return; }
   if(cur.length<4){ $('#codeDisp').textContent=cur+k; }
 }
+let safeTries=0;
 function checkCode(cur){
   if(cur==='1147'){
     S.safeOpen=true;
-    $('#safeMsg').innerHTML='<span style="color:var(--ok);font-weight:800">🔓 금고 열림! USB를 되찾았어요.</span><br>안에서 강도훈의 자백 메모가 나왔어요.';
+    $('#safeMsg').innerHTML='<span style="color:var(--ok);font-weight:800">🔓 금고 열림! USB를 되찾았어요.</span><br>'+
+      '닳은 키패드 <b>1·4·7</b> + "그 시각이 열쇠다" + USB가 열린 <b>밤 11시 47분</b> = <b>1147</b>. 훌륭한 추리!<br>금고 안에서 강도훈의 자백 메모도 나왔어요.';
     $('#codeDisp').style.color='var(--ok)';
     $('#toCourt').disabled=false; S.aiDone=true; markTabDone(2);
     toast('금고 해제! 모의 재판으로!');
   }else{
-    $('#safeMsg').innerHTML='<span style="color:var(--danger)">❌ 암호가 틀렸어요. 감식 리포트의 <b>암호</b> 칸 숫자를 순서대로 눌러 보세요.</span>';
+    safeTries++;
+    $('#safeMsg').innerHTML='<span style="color:var(--danger)">❌ 열리지 않아요. 현장에서 본 단서들을 다시 떠올려 보세요.</span>';
+    const hb=$('#safeHints');
+    if(safeTries===2) hb.innerHTML+='<span class="sh">💡 <b>힌트 1</b> — 금고 키패드에서 닳아 있던 숫자는 <b>1 · 4 · 7</b> 뿐. 암호는 이 세 숫자로만 이루어져요. 네 자리인데 숫자는 셋 — 하나는 <b>두 번</b> 눌려요!</span>';
+    if(safeTries===4) hb.innerHTML+='<span class="sh">💡 <b>힌트 2</b> — 찢어진 메모: "<b>그 시각</b>이 열쇠다". 노트북 기록에서 USB가 열린 시각은 <b>밤 11시 47분</b>이었죠…</span>';
     $('#codeDisp').textContent='';
   }
 }
@@ -1127,6 +1421,17 @@ window.answer=function(qi,oi){
 $('#toReport').addEventListener('click',()=>go('report'));
 
 /* ---------- 5. 최종 보고 ---------- */
+function shareText(){
+  const dots=id=>'●'.repeat(NB.lv[id]||0)+'○'.repeat(5-(NB.lv[id]||0));
+  return ['🕵️ 솔로몬 법정 · 나의 수사 결과',
+   '최종 지목: 강도훈 ✅ (지목 시도 '+((S.wrongAccuse||0)+1)+'회)',
+   '금고 해제 시도: '+(safeTries+1)+'회',
+   '법정 퀴즈: '+S.score+' / 5',
+   '── 내 의심도 기록 ──',
+   ...SUSPECTS.map(s=>s.nm+' '+dots(s.id)),
+   (NB.memo?'📝 '+NB.memo:'')
+  ].filter(Boolean).join('\n');
+}
 function syncReport(){
   const done=S.quizDone.size===5;
   $('#reportLock').style.display=done?'none':'block';
@@ -1135,10 +1440,47 @@ function syncReport(){
     $('#finalScore').textContent=S.score+' / 5';
     const m=['다음엔 더 잘할 수 있어요!','좋아요! 조금만 더!','훌륭한 수사관이에요!','대단해요, 명탐정!','완벽해요! 최고의 과학수사관 🏆'][S.score];
     $('#scoreMsg').textContent='퀴즈 정답 '+S.score+'개 — '+m;
+    $('#shareView').innerHTML=shareText().replace(/\n/g,'<br>');
     markTabDone(4);
   }
 }
-$('#restart').addEventListener('click',()=>location.reload());
+$('#copyShare').addEventListener('click',()=>{
+  const tx=shareText();
+  const ok=()=>toast('복사 완료! 친구에게 붙여넣어 추리를 비교해 보세요');
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(tx).then(ok).catch(()=>fallbackCopy(tx,ok)); }
+  else fallbackCopy(tx,ok);
+});
+function fallbackCopy(tx,ok){
+  const ta=document.createElement('textarea'); ta.value=tx; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand('copy'); ok(); }catch(e){ toast('복사가 안 돼요 — 카드 내용을 길게 눌러 복사하세요'); }
+  ta.remove();
+}
+$('#restart').addEventListener('click',()=>{ try{localStorage.removeItem('solomon_nb');}catch(e){} location.reload(); });
+
+/* ---------- 수사 수첩 ---------- */
+const NB={lv:{dohoon:0,seoyeon:0,cheolung:0,junhyeok:0},memo:''};
+try{ const sv=JSON.parse(localStorage.getItem('solomon_nb')||'null'); if(sv){ Object.assign(NB.lv,sv.lv||{}); NB.memo=sv.memo||''; } }catch(e){}
+function saveNb(){ try{ localStorage.setItem('solomon_nb',JSON.stringify(NB)); }catch(e){} }
+function buildNb(){
+  const w=$('#nbList'); w.innerHTML='';
+  SUSPECTS.forEach(s=>{
+    const row=document.createElement('div'); row.className='nb-row';
+    row.innerHTML='<img src="'+s.img+'" alt=""><div class="nb-nm">'+s.nm+'</div><span class="nb-lb">의심도</span>'+
+      '<div class="nb-dots" id="nbd-'+s.id+'">'+[1,2,3,4,5].map(n=>'<i data-n="'+n+'"></i>').join('')+'</div>';
+    w.appendChild(row);
+    row.querySelectorAll('.nb-dots i').forEach(dot=>{
+      dot.onclick=()=>{ const n=+dot.dataset.n; NB.lv[s.id]=(NB.lv[s.id]===n?0:n); paintNb(s.id); saveNb(); };
+    });
+    paintNb(s.id);
+  });
+  $('#nbMemo').value=NB.memo||'';
+}
+function paintNb(id){ $$('#nbd-'+id+' i').forEach(d=>d.classList.toggle('on',+d.dataset.n<=(NB.lv[id]||0))); }
+$('#nbFab').addEventListener('click',()=>$('#nbBg').classList.add('on'));
+$('#nbX').addEventListener('click',()=>$('#nbBg').classList.remove('on'));
+$('#nbBg').addEventListener('click',e=>{ if(e.target.id==='nbBg')$('#nbBg').classList.remove('on'); });
+$('#nbMemo').addEventListener('input',e=>{ NB.memo=e.target.value; saveNb(); });
+buildNb();
 
 /* ---------- 시작 ---------- */
 buildLab();
