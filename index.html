@@ -636,6 +636,44 @@ h1,h2,h3,p{margin:0}
 .dd-row.txt{grid-template-columns:repeat(2,1fr)}
 .dd-s.dd-txt{padding:13px 8px}
 .dd-s.dd-txt .nm{font-size:13px;margin-top:0}
+
+/* ==== 용의자 심문 (모순 찾기) ==== */
+.itr{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.itr img{width:46px;height:46px;border-radius:50%;object-fit:cover;object-position:top center;border:1px solid var(--line);flex:0 0 auto}
+.itr .itr-nm{font-weight:800;font-size:13.5px;margin-bottom:4px}
+.itr .itr-nm span{font-weight:600;font-size:11.5px;color:var(--muted)}
+.stline{display:block;font-size:13.5px;line-height:1.7;color:var(--ink);padding:3px 8px;margin:2px 0;
+  border-radius:8px;cursor:pointer;transition:.12s;border:1px solid transparent}
+.stline:hover{background:rgba(232,176,75,.08);border-color:var(--gold-soft)}
+.stline.no{animation:shake .3s;border-color:var(--danger)}
+.stline.caught{background:rgba(224,96,74,.12);border-color:var(--danger);color:var(--danger);font-weight:700;cursor:default}
+.stline.caught::before{content:'⚡ ';font-weight:900}
+.itr.done .stline{cursor:default}
+.evpick{margin:6px 0 4px 8px;padding:10px;border:1px dashed var(--gold-soft);border-radius:10px;background:rgba(232,176,75,.05)}
+.evpick .q{font-size:12.5px;font-weight:700;margin-bottom:8px}
+.evchip{display:inline-block;font-size:12.5px;padding:8px 12px;margin:0 6px 6px 0;border-radius:20px;
+  border:1px solid var(--line);background:var(--panel2);cursor:pointer;transition:.12s}
+.evchip:hover{border-color:var(--gold)}
+.evchip.no{animation:shake .3s;border-color:var(--danger)}
+.objection{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;pointer-events:none}
+.objection.on{display:flex}
+.objection span{font-size:52px;font-weight:900;color:var(--danger);letter-spacing:.05em;
+  text-shadow:0 4px 22px rgba(224,96,74,.6);transform:rotate(-6deg);animation:discPop 1s ease forwards}
+
+/* ==== 기소장 작성 ==== */
+.ind-form{border:1px solid var(--gold-soft);border-radius:14px;padding:16px;background:rgba(232,176,75,.04)}
+.ind-row{font-size:13.5px;margin-bottom:6px}
+.ind-lb{display:inline-block;font-size:11.5px;color:var(--gold-soft);font-family:var(--fontm);margin-right:10px;letter-spacing:.06em}
+.ind-evs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ind-ev{font-size:12.5px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel2);cursor:pointer;transition:.12s}
+.ind-ev:hover{border-color:var(--gold)}
+.ind-ev.sel{border-color:var(--gold);background:rgba(232,176,75,.14);font-weight:700}
+.ind-rsn{margin:8px 0}
+.ind-rsn .rl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.ind-rsn textarea{width:100%;min-height:44px;background:#0c0904;border:1px solid var(--line);border-radius:9px;
+  color:var(--ink);font-family:var(--fontd);font-size:13px;padding:8px 10px;resize:vertical}
+.ind-rsn textarea:focus{outline:none;border-color:var(--gold-soft)}
 </style>
 </head>
 <body>
@@ -745,10 +783,20 @@ h1,h2,h3,p{margin:0}
 <section class="page" id="ai">
   <div id="aiLock" class="locknote">🔒 먼저 <b>현장 조사</b>와 <b>과학 수사</b>를 끝내야 AI가 분석을 시작할 수 있어요.</div>
   <div id="aiReady" style="display:none">
-    <p class="lead">AI가 감식 결과를 <b>교차 분석</b>해요. <b>필적·DNA</b>는 박철웅이 <b>목격자</b>임을 밝혀 용의선상에서 지우고,
-    <b>혈액형</b>은 후보를 2명으로 좁히고, <b>지문</b>이 마지막 한 사람을 가리켜요.
-    <b>직접 증거 2개(지문+혈흔)가 모두 겹치는 사람</b>이 진범! 분석 결과를 보고 <b>직접 얼굴을 클릭</b>해 지목하세요.</p>
-    <div class="board">
+    <p class="lead">감식이 끝났다고 수사가 끝난 게 아니에요. 먼저 <b>용의자 심문</b>에서 진술과 증거가 어긋나는
+    <b>모순</b>을 찾아내고, AI <b>교차 분석</b>으로 진범을 지목한 뒤, <b>기소장</b>을 직접 작성해야 재판에 넘길 수 있어요.</p>
+
+    <!-- 1부 · 용의자 심문 (모순 찾기) -->
+    <div class="card" id="interroWrap" style="margin-bottom:18px">
+      <h3 style="color:var(--gold);margin-bottom:6px">🗣️ 1부 · 용의자 심문 <span id="interroCount" style="font-family:var(--fontm);font-size:13px;color:var(--muted)">모순 0 / 2</span></h3>
+      <p style="font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:12px">
+      용의자들의 진술을 읽고, <b>감식 결과와 어긋나는 문장</b>을 찾아 클릭하세요.
+      문장을 찾으면 <b>어떤 증거와 모순되는지</b>도 골라야 "이의 있음!"이 성립해요. (모순은 총 <b>2개</b>)</p>
+      <div id="interroList"></div>
+      <div class="result" id="res-interro"></div>
+    </div>
+
+    <div class="board" id="aiBoardWrap">
       <h3 style="color:var(--ai);margin-bottom:4px">🧠 AI 증거 교차 분석</h3>
       <div class="ev-list" id="evBoard"></div>
       <div class="suspects" id="suspBoard"></div>
@@ -756,6 +804,24 @@ h1,h2,h3,p{margin:0}
         <button class="btn ai" id="runAi">🧠 AI 교차 분석 시작 ▶</button>
       </div>
       <div class="accuse-hint" id="accuseHint" style="display:none"></div>
+
+      <!-- 3부 · 기소장 작성 -->
+      <div id="indictWrap" style="display:none">
+        <h3 style="color:var(--gold);margin:20px 0 6px">📜 3부 · 기소장 작성</h3>
+        <p style="font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:10px">
+        지목만으로는 재판에 넘길 수 없어요. <b>증거 3개</b>를 골라 첨부하고, 각 증거가
+        <b>왜 피고인을 가리키는지</b> 여러분의 문장으로 쓰세요. 판사는 <b>직접 증거 없는 기소</b>를 기각합니다!</p>
+        <div class="ind-form">
+          <div class="ind-row"><span class="ind-lb">피고인</span><b style="color:var(--danger)">강도훈 (검사 출신 변호사)</b></div>
+          <div class="ind-row"><span class="ind-lb">죄명</span>증거인멸 및 절도 (증거 USB 은닉)</div>
+          <div class="ind-lb" style="margin:10px 0 6px">첨부 증거 — <b>3개</b>를 고르세요 <span id="indPickCount" style="font-family:var(--fontm)">0 / 3</span></div>
+          <div class="ind-evs" id="indEvs"></div>
+          <div id="indReasons"></div>
+          <div class="center mt"><button class="btn" id="indSubmit">⚖️ 기소장 제출</button></div>
+          <div class="result" id="res-indict"></div>
+        </div>
+      </div>
+
       <div id="aiVerdict" style="display:none">
         <div class="clue" style="margin-top:18px;border-color:var(--danger);background:rgba(224,96,74,.08)"
           id="verdictText"></div>
@@ -866,12 +932,14 @@ h1,h2,h3,p{margin:0}
     <div class="dlg-head">🗒️ 나의 수사 수첩</div>
     <p class="nb-tip">단서를 볼 때마다 <b>스스로</b> 용의자별 의심도를 조절하고, 그렇게 생각한 <b>근거</b>를 메모하세요.
     앱은 정답을 미리 알려주지 않아요 — 이건 여러분의 추리입니다. 수사가 끝나면 <b>추리 카드</b>로 만들어 친구와 비교해 보세요!</p>
+    <input class="nb-memo" style="min-height:0;height:auto" id="nbName" placeholder="👤 이름 또는 팀명 — 추리 카드·시합 기록에 표시돼요">
     <div id="nbList"></div>
     <textarea class="nb-memo" id="nbMemo" placeholder="추리 메모 — 누구를, 왜 의심하나요? 근거를 적어 보세요."></textarea>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 <div class="disc" id="disc"><div class="burst"><div class="em" id="discEm">🔍</div><div class="tag" id="discTag">단서 발견!</div></div></div>
+<div class="objection" id="objection"><span>이의 있음!</span></div>
 <button class="mute" id="muteBtn" title="효과음 켜기/끄기" aria-label="효과음 켜기/끄기">🔊</button>
 
 <script>
@@ -1625,11 +1693,91 @@ $('#toAi').addEventListener('click',()=>go('ai'));
 
 /* ---------- 3. AI 분석 ---------- */
 function syncAi(){
-  const ready=S.clues.size===7 && S.exps.size>=1;
+  const ready=S.clues.size===7 && S.exps.size>=4;
   $('#aiLock').style.display=ready?'none':'block';
   $('#aiReady').style.display=ready?'block':'none';
-  if(ready && !$('#evBoard').dataset.built){ buildAiBoard(); $('#evBoard').dataset.built='1'; }
+  if(ready && !$('#evBoard').dataset.built){
+    buildAiBoard(); buildInterro();
+    if(!S.interroDone){ $('#runAi').disabled=true; $('#runAi').textContent='🔒 심문(모순 2개)을 끝내면 → AI 교차 분석'; }
+    $('#evBoard').dataset.built='1';
+  }
 }
+
+/* ---------- 3-1. 용의자 심문 (모순 찾기) ---------- */
+const INTERRO=[
+ {id:'dohoon',lines:[
+   {t:'저는 그날 밤 재판 준비 서류만 잠깐 챙겨서 일찍 나갔습니다.'},
+   {t:'법정에서 커피요? 전 그날 커피는 입에도 대지 않았습니다.',ev:'print',
+    hit:'커피잔에서 나온 지문은 강도훈의 것! "커피를 안 마셨다"는 진술은 거짓이에요.'},
+   {t:'USB가 없어져서 저야말로 곤란한 사람입니다.'}]},
+ {id:'seoyeon',lines:[
+   {t:'금고 비밀번호는 저만 알아요. 최근에 바꾼 적도 없고요.'},
+   {t:'그날 밤엔 속기록 정리를 끝내고 10시쯤 퇴근했습니다.'}]},
+ {id:'cheolung',lines:[
+   {t:'돈 문제는… 인정합니다. 부끄럽네요.'},
+   {t:'하지만 그날 밤 법정 안에는 발도 들이지 않았습니다.',ev:'dna',
+    hit:'법정 안 자켓에서 박철웅의 머리카락이 나왔어요! "안에 안 들어갔다"는 진술은 거짓이에요.'},
+   {t:'순찰은 복도에서만 돌았습니다.'}]},
+ {id:'junhyeok',lines:[
+   {t:'전 방청석에서 사건 기록만 하고 있었어요.'},
+   {t:'로그가 지워진 건 제가 봐도 이상합니다. 전 아니에요.'}]}
+];
+const INTERRO_EVCHIPS=[
+ {k:'print',lb:'☝️ 커피잔 지문'},{k:'blood',lb:'🩸 혈흔 A형'},{k:'dna',lb:'🧬 머리카락 DNA'},
+ {k:'hand',lb:'✍️ 메모 필적'},{k:'log',lb:'💻 접속 기록'}
+];
+const IT={found:new Set(),wrong:0,open:null};
+function objection(){ const o=$('#objection'); o.classList.remove('on'); void o.offsetWidth; o.classList.add('on');
+  sfx('key'); vibrate([30,40,30]); clearTimeout(o._t); o._t=setTimeout(()=>o.classList.remove('on'),1000); }
+function buildInterro(){
+  $('#interroList').innerHTML=INTERRO.map((p,pi)=>{
+    const s=SUS[p.id];
+    return '<div class="itr" id="itr-'+pi+'"><img src="'+s.img+'" alt="'+s.name+'"><div style="flex:1">'+
+      '<div class="itr-nm">'+s.name+' <span>· '+s.role+'</span></div>'+
+      p.lines.map((l,li)=>'<span class="stline" id="st-'+pi+'-'+li+'" onclick="pickLine('+pi+','+li+')">"'+l.t+'"</span>').join('')+
+      '<div id="evp-'+pi+'"></div>'+
+      '</div></div>';
+  }).join('');
+}
+window.pickLine=function(pi,li){
+  if(S.interroDone)return;
+  const line=INTERRO[pi].lines[li], el=$('#st-'+pi+'-'+li);
+  const key=pi+'-'+li;
+  if(IT.found.has(key)||IT.open===key)return;
+  if(line.ev){
+    IT.open=key;
+    const evp=$('#evp-'+pi);
+    evp.innerHTML='<div class="evpick"><div class="q">🔎 좋은 지적! 이 진술은 <b>어떤 감식 결과</b>와 모순될까요?</div>'+
+      INTERRO_EVCHIPS.map(c=>'<span class="evchip" onclick="pickEvChip('+pi+','+li+',\''+c.k+'\',this)">'+c.lb+'</span>').join('')+'</div>';
+    el.classList.add('caught'); sfx('tick');
+  }else{
+    IT.wrong++; el.classList.add('no'); sfx('wrong'); setTimeout(()=>el.classList.remove('no'),400);
+    toast('이 진술은 증거와 어긋나지 않아요. 감식 결과를 떠올려 보세요!');
+  }
+};
+window.pickEvChip=function(pi,li,k,chip){
+  const line=INTERRO[pi].lines[li], key=pi+'-'+li;
+  if(IT.found.has(key))return;
+  if(k===line.ev){
+    IT.found.add(key); IT.open=null;
+    $('#evp-'+pi).innerHTML='<div class="evpick" style="border-style:solid;border-color:var(--ok)"><div class="q" style="color:var(--ok)">⚡ 이의 있음! '+line.hit+'</div></div>';
+    objection(); addScore(15);
+    $('#interroCount').textContent='모순 '+IT.found.size+' / 2';
+    if(IT.found.size>=2){
+      S.interroDone=true;
+      const r=$('#res-interro'); r.className='result ok show';
+      r.innerHTML='✅ <b>심문 완료 — 모순 2개를 모두 밝혀냈어요!</b><br>'+
+        '🗣️ 박철웅: "…알겠습니다, 사실대로 말할게요. 순찰 중 이상한 기척에 법정에 들어갔고, <b>밤 11시 47분</b>에 누군가 노트북 앞에 있는 걸 봤습니다. 그래서 그 메모를 남긴 거예요."<br>'+
+        '🗣️ 강도훈: "…커피는, 그게… 기억이 잘 안 나는군요." <i>(눈에 띄게 동요한다)</i><br>'+
+        '이제 <b>AI 교차 분석</b>으로 진범을 지목하세요!';
+      $('#runAi').disabled=false; $('#runAi').textContent='🧠 AI 교차 분석 시작 ▶';
+      toast('심문 완료! AI 교차 분석이 열렸어요');
+    }
+  }else{
+    IT.wrong++; chip.classList.add('no'); sfx('wrong'); setTimeout(()=>chip.classList.remove('no'),400);
+    toast('그 증거와는 모순되지 않아요. 진술 내용을 다시 읽어보세요!');
+  }
+};
 function buildAiBoard(){
   $('#evBoard').innerHTML=EV_ROWS.map((r,i)=>
     '<div class="ev" id="evrow-'+i+'"><span class="dot"></span>'+r.t+'</div>').join('');
@@ -1670,19 +1818,77 @@ window.accuse=function(id){
     S.accused=true;
     SUSPECTS.forEach(x=>{ const el=$('#susp-'+x.id); el.classList.remove('pickable','low','top'); el.onclick=null; });
     $('#susp-'+id).classList.add('guilty');
-    ah.innerHTML='🎯 <b style="color:var(--ok)">정답! 강도훈이 진범입니다.</b> 지문과 혈흔, 두 직접 증거가 겹치는 단 한 사람이에요.';
-    $('#aiVerdict').style.display='block';
-    $('#verdictText').innerHTML='🚨 <b>지목 성공!</b> 수사의 흐름을 되짚어 봐요 — <b>필적</b>로 메모 작성자(박철웅)를 확인하되 단정하지 않았고, '+
-      '<b>혈흔·DNA</b>로 후보를 좁혔고, 마지막 <b>지문 대조</b>가 <b>강도훈 변호사</b>를 확정했어요. 이제 금고를 열어 USB를 되찾으세요!';
-    buildPad();
-    setTimeout(()=>$('#aiVerdict').scrollIntoView({behavior:'smooth'}),200);
-    toast('진범 지목 성공! 금고 암호를 입력하세요');
+    ah.innerHTML='🎯 <b style="color:var(--ok)">정답! 강도훈이 진범입니다.</b> 지문과 혈흔, 두 직접 증거가 겹치는 단 한 사람이에요. 이제 <b>기소장</b>을 작성해 재판에 넘기세요!';
+    $('#indictWrap').style.display='block';
+    buildIndict();
+    setTimeout(()=>$('#indictWrap').scrollIntoView({behavior:'smooth',block:'center'}),200);
+    toast('지목 성공! 기소장을 작성하세요');
   }else{
     S.wrongAccuse=(S.wrongAccuse||0)+1;
     const el=$('#susp-'+id); el.classList.add('cleared'); setTimeout(()=>el.classList.remove('cleared'),550);
     ah.innerHTML='❌ <b>'+s.nm+'</b>은(는) 진범이 아니에요. '+s.clear+'<br>👉 <b>직접 증거 2개(지문+혈흔)가 모두 겹치는</b> 사람을 다시 찾아 클릭하세요.';
   }
 };
+
+/* ---------- 3-3. 기소장 작성 ---------- */
+const INDICT_EV=[
+ {k:'print',lb:'☝️ 지문 — 커피잔·감식 카드 일치',direct:true},
+ {k:'blood',lb:'🩸 혈흔 혈액형 A형',direct:true},
+ {k:'witness',lb:'🗣️ 박철웅의 11:47 목격 진술',direct:false},
+ {k:'log',lb:'💻 USB 열람 기록 (밤 11:47)',direct:false},
+ {k:'trash',lb:'🗑️ 찢긴 증거 목록 (동기)',direct:false},
+ {k:'lie',lb:'⚡ 심문 모순 — "커피 안 마셨다" 거짓 진술',direct:false}
+];
+const IND={sel:new Set()};
+function buildIndict(){
+  $('#indEvs').innerHTML=INDICT_EV.map((e,i)=>
+    '<span class="ind-ev" id="indev-'+i+'" onclick="togEv('+i+')">'+e.lb+'</span>').join('');
+  renderIndReasons();
+}
+window.togEv=function(i){
+  if(S.indict)return;
+  if(IND.sel.has(i)) IND.sel.delete(i);
+  else{ if(IND.sel.size>=3){ toast('증거는 딱 3개만! 다른 것을 빼고 고르세요'); return; } IND.sel.add(i); }
+  $('#indev-'+i).classList.toggle('sel',IND.sel.has(i));
+  $('#indPickCount').textContent=IND.sel.size+' / 3';
+  renderIndReasons();
+};
+function renderIndReasons(){
+  const w=$('#indReasons');
+  const prev={}; w.querySelectorAll('textarea').forEach(t=>prev[t.dataset.k]=t.value);
+  w.innerHTML=[...IND.sel].map(i=>{ const e=INDICT_EV[i];
+    return '<div class="ind-rsn"><div class="rl">'+e.lb+' — <b>이 증거가 강도훈을 가리키는 이유</b>를 한 문장으로 쓰세요</div>'+
+      '<textarea data-k="'+e.k+'" placeholder="예: 커피잔의 지문이 강도훈의 와상문과 특징점까지 일치하기 때문이다.">'+(prev[e.k]||'')+'</textarea></div>';
+  }).join('');
+}
+$('#indSubmit').addEventListener('click',()=>{
+  if(S.indict)return;
+  const r=$('#res-indict');
+  if(IND.sel.size!==3){ r.className='result show'; r.innerHTML='⚖️ 판사: "첨부 증거는 <b>정확히 3개</b>여야 합니다."'; sfx('wrong'); return; }
+  const keys=[...IND.sel].map(i=>INDICT_EV[i].k);
+  if(!keys.includes('print')||!keys.includes('blood')){
+    r.className='result show';
+    r.innerHTML='🙅 변호인: "이의 있습니다! <b>정황 증거만으로는</b> 유죄를 입증할 수 없습니다."<br>⚖️ 판사: "기각합니다. <b>직접 증거(지문·혈흔)</b>를 갖춰 다시 제출하세요."';
+    sfx('wrong'); return;
+  }
+  const reasons={}; let tooShort=false;
+  $('#indReasons').querySelectorAll('textarea').forEach(t=>{ reasons[t.dataset.k]=t.value.trim(); if(t.value.trim().length<8) tooShort=true; });
+  if(tooShort){
+    r.className='result show';
+    r.innerHTML='⚖️ 판사: "근거 서술이 부족합니다. 각 증거가 <b>왜 피고인을 가리키는지</b> 문장으로 쓰세요. (8자 이상)"';
+    sfx('wrong'); return;
+  }
+  S.indict={evs:keys,reasons:reasons};
+  r.className='result ok show';
+  r.innerHTML='✅ ⚖️ 판사: "기소를 <b>인가</b>합니다. 직접 증거와 논리적 근거가 갖춰졌습니다."';
+  $('#indSubmit').disabled=true; sfx('win'); addScore(20);
+  $('#aiVerdict').style.display='block';
+  $('#verdictText').innerHTML='🚨 <b>기소 성공!</b> 수사의 흐름을 되짚어 봐요 — <b>필적</b>로 메모 작성자(박철웅)를 확인하되 단정하지 않았고, '+
+    '<b>혈흔·DNA</b>로 후보를 좁혔고, <b>심문</b>으로 거짓 진술을 무너뜨렸고, <b>지문 대조</b>가 강도훈을 확정했어요. 이제 금고를 열어 USB를 되찾으세요!';
+  buildPad();
+  setTimeout(()=>$('#aiVerdict').scrollIntoView({behavior:'smooth'}),300);
+  toast('기소 인가! 금고 암호를 유추해 입력하세요');
+});
 function buildPad(){
   const pad=$('#pad'); pad.innerHTML='';
   ['1','2','3','4','5','6','7','8','9','←','0','✓'].forEach(k=>{
@@ -1776,8 +1982,12 @@ $('#toReport').addEventListener('click',()=>go('report'));
 /* ---------- 5. 최종 보고 ---------- */
 function shareText(){
   const dots=id=>'●'.repeat(NB.lv[id]||0)+'○'.repeat(5-(NB.lv[id]||0));
-  return ['🕵️ 솔로몬 법정 · 나의 수사 결과',
+  const evLb=k=>{const e=INDICT_EV.find(x=>x.k===k);return e?e.lb.replace(/^[^ ]+ /,''):k;};
+  return ['🕵️ 솔로몬 법정 · '+(NB.name?NB.name+'의':'나의')+' 수사 결과',
+   '추리 점수: '+S.deduceScore+'점',
+   '심문: 모순 '+IT.found.size+'/2 발견 (오답 '+IT.wrong+'회)',
    '최종 지목: 강도훈 ✅ (지목 시도 '+((S.wrongAccuse||0)+1)+'회)',
+   (S.indict?'기소 증거: '+S.indict.evs.map(evLb).join(' · '):''),
    '금고 해제 시도: '+(safeTries+1)+'회',
    '법정 퀴즈: '+S.score+' / 5',
    '── 내 의심도 기록 ──',
@@ -1785,6 +1995,25 @@ function shareText(){
    (NB.memo?'📝 '+NB.memo:'')
   ].filter(Boolean).join('\n');
 }
+/* DB 연동용 결과 페이로드 — 서버가 준비되면 이 객체를 그대로 POST하면 됩니다.
+   예: fetch(API_URL+'/results',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(SOLOMON_RESULT())})
+   학생 개인전: name에 이름 / 팀전: name에 팀명을 넣고 서버에서 집계 */
+window.SOLOMON_RESULT=function(){
+  return {
+    version:2,
+    name:NB.name||null,
+    finishedAt:new Date().toISOString(),
+    deduceScore:S.deduceScore,
+    interrogation:{found:IT.found.size,wrong:IT.wrong},
+    accuse:{final:'dohoon',wrongTries:S.wrongAccuse||0},
+    indictment:S.indict,
+    safe:{opened:S.safeOpen,tries:safeTries+ (S.safeOpen?1:0)},
+    admissibility:S.adm.size,
+    quizScore:S.score,
+    notebook:{levels:NB.lv,memo:NB.memo||''}
+  };
+};
 function syncReport(){
   const done=S.quizDone.size===5;
   $('#reportLock').style.display=done?'none':'block';
@@ -1839,8 +2068,8 @@ $('#zoomArea').addEventListener('touchend',()=>{ Z.pinch=0; });
 $('#zoomBg').addEventListener('click',e=>{ if(e.target.id==='zoomBg') closeZoom(); });
 
 /* ---------- 수사 수첩 ---------- */
-const NB={lv:{dohoon:0,seoyeon:0,cheolung:0,junhyeok:0},memo:''};
-try{ const sv=JSON.parse(localStorage.getItem('solomon_nb')||'null'); if(sv){ Object.assign(NB.lv,sv.lv||{}); NB.memo=sv.memo||''; } }catch(e){}
+const NB={lv:{dohoon:0,seoyeon:0,cheolung:0,junhyeok:0},memo:'',name:''};
+try{ const sv=JSON.parse(localStorage.getItem('solomon_nb')||'null'); if(sv){ Object.assign(NB.lv,sv.lv||{}); NB.memo=sv.memo||''; NB.name=sv.name||''; } }catch(e){}
 function saveNb(){ try{ localStorage.setItem('solomon_nb',JSON.stringify(NB)); }catch(e){} }
 function buildNb(){
   const w=$('#nbList'); w.innerHTML='';
@@ -1855,12 +2084,14 @@ function buildNb(){
     paintNb(s.id);
   });
   $('#nbMemo').value=NB.memo||'';
+  $('#nbName').value=NB.name||'';
 }
 function paintNb(id){ $$('#nbd-'+id+' i').forEach(d=>d.classList.toggle('on',+d.dataset.n<=(NB.lv[id]||0))); }
 $('#nbFab').addEventListener('click',()=>$('#nbBg').classList.add('on'));
 $('#nbX').addEventListener('click',()=>$('#nbBg').classList.remove('on'));
 $('#nbBg').addEventListener('click',e=>{ if(e.target.id==='nbBg')$('#nbBg').classList.remove('on'); });
 $('#nbMemo').addEventListener('input',e=>{ NB.memo=e.target.value; saveNb(); });
+$('#nbName').addEventListener('input',e=>{ NB.name=e.target.value.trim(); saveNb(); });
 buildNb();
 
 /* ---------- 시작 ---------- */
