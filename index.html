@@ -749,6 +749,57 @@ h1,h2,h3,p{margin:0}
 .ind-rsn textarea{width:100%;min-height:44px;background:#0c0904;border:1px solid var(--line);border-radius:9px;
   color:var(--ink);font-family:var(--fontd);font-size:13px;padding:8px 10px;resize:vertical}
 .ind-rsn textarea:focus{outline:none;border-color:var(--gold-soft)}
+
+/* ==== 로그인 ==== */
+.login-bg{position:fixed;inset:0;z-index:250;background:radial-gradient(120% 90% at 50% -10%,#211609,#0e0b07 60%,#080602);
+  display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.login-bg.on{display:flex;animation:fade .3s}
+.login-card{width:100%;max-width:380px;background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--gold-soft);border-radius:18px;padding:30px 26px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.login-seal{width:56px;height:56px;margin:0 auto 12px;border-radius:50%;border:2px solid var(--gold);
+  display:grid;place-items:center;color:var(--gold);font-size:28px;box-shadow:0 0 20px rgba(232,176,75,.25) inset}
+.login-t{font-size:22px;font-weight:900;color:var(--ink)}
+.login-sub{font-size:13px;color:var(--muted);margin:6px 0 20px;line-height:1.6}
+.login-sub b{color:var(--gold)}
+.login-lb{display:block;text-align:left;font-size:12px;color:var(--gold-soft);font-family:var(--fontm);margin:12px 0 5px}
+.login-hint{color:var(--muted);font-size:11px}
+.login-in{width:100%;background:#0c0904;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);font-family:var(--fontd);font-size:15px;padding:12px 14px}
+.login-in:focus{outline:none;border-color:var(--gold-soft)}
+.login-mode{display:flex;gap:8px;margin-top:14px}
+.lg-mode{flex:1;padding:11px 0;border-radius:10px;border:1px solid var(--line);background:#0c0904;
+  color:var(--muted);font-size:14px;font-weight:700;transition:.15s}
+.lg-mode.act{border-color:var(--gold);background:rgba(232,176,75,.14);color:var(--gold)}
+.login-err{min-height:18px;color:var(--danger);font-size:12.5px;margin:10px 0 4px}
+.login-skip{display:block;margin:14px auto 0;font-size:12.5px;color:var(--muted);text-decoration:underline;background:none}
+.login-skip:hover{color:var(--gold-soft)}
+
+/* ==== 순위판 ==== */
+.rank-fab{position:fixed;left:14px;bottom:70px;z-index:60;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--gold-soft);
+  color:var(--gold);font-weight:800;font-size:14px;padding:11px 16px;border-radius:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);transition:.15s}
+.rank-fab:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(232,176,75,.25)}
+.rank-tabs{display:flex;gap:8px;align-items:center;margin:6px 0 12px}
+.rk-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:#0c0904;
+  color:var(--muted);font-size:13.5px;font-weight:700}
+.rk-tab.act{border-color:var(--gold);background:var(--gold);color:#1a1206}
+.rk-refresh{margin-left:auto;font-size:12px;color:var(--gold-soft);border:1px solid var(--line);
+  border-radius:8px;padding:6px 10px;background:none}
+.rk-refresh:hover{border-color:var(--gold-soft)}
+.rank-list{max-height:52vh;overflow-y:auto}
+.rank-empty{text-align:center;color:var(--muted);font-size:13.5px;padding:26px 10px;line-height:1.7}
+.rkrow{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;
+  border:1px solid var(--line);background:var(--panel);margin-bottom:8px}
+.rkrow.me{border-color:var(--gold);background:rgba(232,176,75,.08)}
+.rk-medal{font-size:18px;width:30px;text-align:center;font-family:var(--fontm);font-weight:800;color:var(--muted)}
+.rk-nm{font-weight:800;font-size:14.5px;flex:1}
+.rk-nm .rk-team{font-size:11.5px;color:var(--muted);font-weight:600;margin-left:6px}
+.rk-sc{text-align:right;font-family:var(--fontm)}
+.rk-sc .big{font-size:17px;font-weight:800;color:var(--gold)}
+.rk-sc .sub{font-size:10.5px;color:var(--muted)}
+.rk-badge{font-size:11px;color:var(--ai);font-family:var(--fontm)}
 </style>
 </head>
 <body>
@@ -967,6 +1018,12 @@ h1,h2,h3,p{margin:0}
       증거로 진실을 밝혀냈어요.</p>
     <div class="score" id="finalScore">0 / 5</div>
     <p style="color:var(--muted);font-size:14px" id="scoreMsg"></p>
+    <div id="totalBox" style="margin:10px auto 0;display:none">
+      <span style="font-size:13px;color:var(--muted)">종합 점수</span>
+      <div style="font-family:var(--fontm);font-size:38px;font-weight:800;color:var(--ai)"><span id="totalScore">0</span><span style="font-size:18px;color:var(--muted)"> 점</span></div>
+      <div id="saveState" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+      <button class="btn ai mt" id="openRankBtn" style="display:none">🏆 우리 반 순위 보기</button>
+    </div>
     <div class="card mt2" style="max-width:520px;margin:22px auto;text-align:left">
       <h3>🔎 오늘 배운 것</h3>
       <p>· 수사의 흐름 — <b style="color:var(--gold)">필적 일치 → 작성자 확인 → 단정하지 않고 추가 조사 → 혈흔·DNA로 후보 축소 → 지문 대조 → 진범 확정</b><br>
@@ -1035,6 +1092,42 @@ h1,h2,h3,p{margin:0}
   <button class="btn" id="spNext">다음 ▶</button>
 </div></div>
 <button class="mute" id="muteBtn" title="효과음 켜기/끄기" aria-label="효과음 켜기/끄기">🔊</button>
+
+<!-- 로그인 (이름 + 수업코드) -->
+<div class="login-bg" id="loginBg">
+  <div class="login-card">
+    <div class="login-seal">⚖</div>
+    <h2 class="login-t">수사관 등록</h2>
+    <p class="login-sub">같은 <b>수업코드</b>를 쓰는 친구들과 점수를 겨뤄요</p>
+    <label class="login-lb">이름</label>
+    <input class="login-in" id="lgName" maxlength="20" placeholder="예: 홍길동" autocomplete="off">
+    <label class="login-lb">수업코드 <span class="login-hint">(선생님이 알려준 코드)</span></label>
+    <input class="login-in" id="lgCode" maxlength="24" placeholder="예: 5A반" autocomplete="off">
+    <div class="login-mode">
+      <button class="lg-mode act" id="lgSolo" type="button">👤 개인전</button>
+      <button class="lg-mode" id="lgTeam" type="button">👥 팀전</button>
+    </div>
+    <input class="login-in" id="lgTeamName" maxlength="20" placeholder="팀 이름 (예: 1모둠)" autocomplete="off" style="display:none">
+    <div class="login-err" id="lgErr"></div>
+    <button class="btn" id="lgStart" style="width:100%;justify-content:center;margin-top:6px">수사 시작 ▶</button>
+    <button class="login-skip" id="lgSkip" type="button">코드 없이 혼자 연습하기</button>
+  </div>
+</div>
+
+<!-- 우리 반 순위판 -->
+<button class="rank-fab" id="rankFab" style="display:none">🏆 <span>순위판</span></button>
+<div class="dlg-bg" id="rankBg">
+  <div class="dlg" style="max-width:520px">
+    <button class="x" id="rankX">✕</button>
+    <div class="dlg-head">🏆 우리 반 순위판 <span id="rankCode" style="font-family:var(--fontm);font-size:12px;color:var(--muted)"></span></div>
+    <div class="rank-tabs">
+      <button class="rk-tab act" id="rkIndiv" type="button">👤 개인</button>
+      <button class="rk-tab" id="rkTeam" type="button">👥 팀</button>
+      <button class="rk-refresh" id="rkRefresh" type="button">↻ 새로고침</button>
+    </div>
+    <div class="rank-list" id="rankList"><div class="rank-empty">불러오는 중…</div></div>
+  </div>
+</div>
 
 <script>
 const IMG={
@@ -1200,6 +1293,7 @@ const QUIZ=[
    ========================================================= */
 const S={clues:new Set(),exps:new Set(),code:'',aiDone:false,safeOpen:false,quizDone:new Set(),score:0,adm:new Set(),accused:false};
 S.suspicion={}; S.deduceScore=0; S.deduced=new Set(); S.tested=new Set(); S._pending=null; S._wonScene=false;
+S.indictRejects=0;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1700);}
 
@@ -2027,37 +2121,33 @@ $('#indSubmit').addEventListener('click',()=>{
   if(S.indict)return;
   const r=$('#res-indict');
   const bad=(id,cond)=>{ $('#'+id).classList.toggle('p-bad',cond); return cond; };
+  const reject=(msg)=>{ S.indictRejects++; r.className='result show'; r.innerHTML=msg; sfx('wrong'); };
   const pname=$('#pProsecutor').value.trim();
-  if(bad('pProsecutor',!pname)){
-    r.className='result show'; r.innerHTML='⚖️ 반려 — <b>검사(여러분) 이름</b>을 쓰세요.'; sfx('wrong'); return;
-  }
+  if(bad('pProsecutor',!pname)){ reject('⚖️ 반려 — <b>검사(여러분) 이름</b>을 쓰세요.'); return; }
   let wrongForm=false;
   wrongForm=bad('pWho',$('#pWho').value!=='dohoon')||wrongForm;
   wrongForm=bad('pCharge',$('#pCharge').value!=='theft')||wrongForm;
   wrongForm=bad('pTime',$('#pTime').value!=='2347')||wrongForm;
   wrongForm=bad('pItem',$('#pItem').value!=='usb')||wrongForm;
-  if(wrongForm){
-    r.className='result show';
-    r.innerHTML='⚖️ 반려 — <b>붉게 표시된 칸</b>이 사건 기록과 다릅니다. 수사 결과를 떠올려 다시 채우세요.';
-    sfx('wrong'); return;
-  }
-  if(IND.sel.size!==3){ r.className='result show'; r.innerHTML='⚖️ 반려 — 입증 방법(첨부 증거)은 <b>정확히 3개</b>여야 합니다.'; sfx('wrong'); return; }
+  if(wrongForm){ reject('⚖️ 반려 — <b>붉게 표시된 칸</b>이 사건 기록과 다릅니다. 수사 결과를 떠올려 다시 채우세요.'); return; }
+  if(IND.sel.size!==3){ reject('⚖️ 반려 — 입증 방법(첨부 증거)은 <b>정확히 3개</b>여야 합니다.'); return; }
   const keys=[...IND.sel].map(i=>INDICT_EV[i].k);
   if(!keys.includes('print')||!keys.includes('blood')){
-    r.className='result show';
-    r.innerHTML='🙅 변호인: "이의 있습니다! <b>정황 증거만으로는</b> 유죄를 입증할 수 없습니다."<br>⚖️ 판사: "기각합니다. <b>직접 증거(지문·혈흔)</b>를 갖춰 다시 제출하세요."';
-    sfx('wrong'); return;
+    reject('🙅 변호인: "이의 있습니다! <b>정황 증거만으로는</b> 유죄를 입증할 수 없습니다."<br>⚖️ 판사: "기각합니다. <b>직접 증거(지문·혈흔)</b>를 갖춰 다시 제출하세요."'); return;
   }
   const reasons={}; let tooShort=false;
-  $('#indReasons').querySelectorAll('textarea').forEach(t=>{ reasons[t.dataset.k]=t.value.trim(); if(t.value.trim().length<8) tooShort=true; });
-  if(tooShort){
-    r.className='result show';
-    r.innerHTML='⚖️ 반려 — 근거 서술이 부족합니다. 양식에 맞춰 <b>문장으로</b> 쓰세요. (8자 이상)';
-    sfx('wrong'); return;
+  $('#indReasons').querySelectorAll('textarea').forEach(t=>{ reasons[t.dataset.k]=t.value.trim(); if(t.value.trim().length<10) tooShort=true; });
+  if(tooShort){ reject('⚖️ 반려 — 근거 서술이 부족합니다. 양식에 맞춰 <b>문장으로</b> 쓰세요. (10자 이상)'); return; }
+  const norm=s=>s.replace(/\s+/g,'').toLowerCase();
+  const vals=Object.values(reasons).map(norm);
+  if(new Set(vals).size<vals.length){
+    reject('⚖️ 반려 — 세 증거의 근거가 <b>서로 똑같습니다</b>. 증거마다 <b>그 증거에 맞는</b> 근거를 따로 쓰세요!'); return;
   }
-  S.indict={who:'dohoon',charge:'절도 및 증거인멸',time:'23:47',item:'증거 USB',prosecutor:pname,evs:keys,reasons:reasons};
+  // 기소장 점수: 100점 만점, 반려/기각 1회당 -12점 (최저 40)
+  S.indictScore=Math.max(40,100-S.indictRejects*12);
+  S.indict={who:'dohoon',charge:'절도 및 증거인멸',time:'23:47',item:'증거 USB',prosecutor:pname,evs:keys,reasons:reasons,score:S.indictScore,rejects:S.indictRejects};
   r.className='result ok show';
-  r.innerHTML='✅ ⚖️ 판사: "공소사실과 입증 방법이 갖춰졌으므로 기소를 <b>인가</b>합니다."';
+  r.innerHTML='✅ ⚖️ 판사: "공소사실과 입증 방법이 갖춰졌으므로 기소를 <b>인가</b>합니다." <b>(기소장 '+S.indictScore+'점)</b>';
   $('#indSubmit').disabled=true;
   $('#pStamp').classList.add('on'); sfx('win'); addScore(20);
   setTimeout(()=>showPass({ico:'⚖️',t:'기소 인가!',
@@ -2178,11 +2268,12 @@ $('#toReport').addEventListener('click',()=>go('report'));
 function shareText(){
   const dots=id=>'●'.repeat(NB.lv[id]||0)+'○'.repeat(5-(NB.lv[id]||0));
   const evLb=k=>{const e=INDICT_EV.find(x=>x.k===k);return e?e.lb.replace(/^[^ ]+ /,''):k;};
-  return ['🕵️ 솔로몬 법정 · '+(NB.name?NB.name+'의':'나의')+' 수사 결과',
+  return ['🕵️ 솔로몬 법정 · '+(NB.name?NB.name+'의':'나의')+' 수사 결과'+(NB.code?' ['+NB.code+(NB.team?'·'+NB.team:'')+']':''),
+   '🏅 종합 점수: '+totalScore()+'점',
    '추리 점수: '+S.deduceScore+'점',
    '심문: 모순 '+IT.found.size+'/2 발견 (오답 '+IT.wrong+'회)',
    '최종 지목: 강도훈 ✅ (지목 시도 '+((S.wrongAccuse||0)+1)+'회)',
-   (S.indict?'기소 증거: '+S.indict.evs.map(evLb).join(' · '):''),
+   (S.indict?'기소장: '+(S.indict.score||0)+'점 (증거 '+S.indict.evs.map(evLb).join('·')+')':''),
    '금고 해제 시도: '+(safeTries+1)+'회',
    '법정 퀴즈: '+S.score+' / 5',
    '── 내 의심도 기록 ──',
@@ -2194,14 +2285,24 @@ function shareText(){
    예: fetch(API_URL+'/results',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify(SOLOMON_RESULT())})
    학생 개인전: name에 이름 / 팀전: name에 팀명을 넣고 서버에서 집계 */
+// 종합 점수(100점 만점): 추리 30% + 기소장 40% + 퀴즈 30%, 지목/금고 시도 페널티
+function totalScore(){
+  const deducePct=Math.min(100,S.deduceScore);         // 추리 점수(100 상한)
+  const indict=S.indictScore||0;                       // 기소장 100점 만점
+  const quizPct=(S.score/5)*100;                       // 퀴즈 정답률
+  const penalty=(S.wrongAccuse||0)*4 + Math.max(0,(safeTries||0))*2;
+  const raw=deducePct*0.3 + indict*0.4 + quizPct*0.3 - penalty;
+  return Math.max(0,Math.min(100,Math.round(raw)));
+}
 window.SOLOMON_RESULT=function(){
   return {
-    version:2,
-    name:NB.name||null,
-    finishedAt:new Date().toISOString(),
+    version:3,
+    name:NB.name||null, team:NB.team||null, mode:NB.mode||'solo',
+    total:totalScore(),
     deduceScore:S.deduceScore,
     interrogation:{found:IT.found.size,wrong:IT.wrong},
     accuse:{final:'dohoon',wrongTries:S.wrongAccuse||0},
+    indictScore:S.indictScore||0,
     indictment:S.indict,
     safe:{opened:S.safeOpen,tries:safeTries+ (S.safeOpen?1:0)},
     admissibility:S.adm.size,
@@ -2218,8 +2319,22 @@ function syncReport(){
     const m=['다음엔 더 잘할 수 있어요!','좋아요! 조금만 더!','훌륭한 수사관이에요!','대단해요, 명탐정!','완벽해요! 최고의 과학수사관 🏆'][S.score];
     $('#scoreMsg').textContent='퀴즈 정답 '+S.score+'개 — '+m;
     $('#shareView').innerHTML=shareText().replace(/\n/g,'<br>');
+    $('#totalBox').style.display='block';
+    $('#totalScore').textContent=totalScore();
     markTabDone(4);
+    submitAndShowRank();
   }
+}
+let _submitted=false;
+async function submitAndShowRank(){
+  if(_submitted) return; _submitted=true;
+  const ss=$('#saveState'), rb=$('#openRankBtn');
+  if(!NB.code){ ss.textContent='(혼자 연습 모드 — 순위 미등록)'; return; }
+  ss.textContent='결과 저장 중…';
+  const r=await saveResult();
+  if(r.ok){ ss.innerHTML='✅ <b>'+esc(NB.code)+'</b> 반에 제출 완료!'; rb.style.display='inline-flex'; rb.onclick=openRank; $('#rankFab').style.display=''; }
+  else if(r.noDb){ ss.textContent='순위판 서버가 아직 연결되지 않았어요 (선생님 설정 필요)'; }
+  else{ ss.textContent='저장에 실패했어요. 네트워크를 확인해 주세요.'; }
 }
 $('#copyShare').addEventListener('click',()=>{
   const tx=shareText();
@@ -2263,8 +2378,8 @@ $('#zoomArea').addEventListener('touchend',()=>{ Z.pinch=0; });
 $('#zoomBg').addEventListener('click',e=>{ if(e.target.id==='zoomBg') closeZoom(); });
 
 /* ---------- 수사 수첩 ---------- */
-const NB={lv:{dohoon:0,seoyeon:0,cheolung:0,junhyeok:0},memo:'',name:''};
-try{ const sv=JSON.parse(localStorage.getItem('solomon_nb')||'null'); if(sv){ Object.assign(NB.lv,sv.lv||{}); NB.memo=sv.memo||''; NB.name=sv.name||''; } }catch(e){}
+const NB={lv:{dohoon:0,seoyeon:0,cheolung:0,junhyeok:0},memo:'',name:'',code:'',team:'',mode:'solo'};
+try{ const sv=JSON.parse(localStorage.getItem('solomon_nb')||'null'); if(sv){ Object.assign(NB.lv,sv.lv||{}); NB.memo=sv.memo||''; NB.name=sv.name||''; NB.code=sv.code||''; NB.team=sv.team||''; NB.mode=sv.mode||'solo'; } }catch(e){}
 function saveNb(){ try{ localStorage.setItem('solomon_nb',JSON.stringify(NB)); }catch(e){} }
 function buildNb(){
   const w=$('#nbList'); w.innerHTML='';
@@ -2323,10 +2438,95 @@ function playBriefing(){
   w.addEventListener('click',e=>{ if(e.target.id==='bfGo'||e.target.id==='bfSkip')return; nextB(); });
   render();
 }
-document.getElementById('startBtn').addEventListener('click',()=>{
+/* ---------- 로그인 (이름 + 수업코드) ---------- */
+function beginGame(){
   const i=document.getElementById('intro'); i.classList.add('hide');
   setTimeout(()=>{i.style.display='none';},600);
+  $('#loginBg').classList.remove('on');
+  if(NB.code) $('#rankFab').style.display='';
   playBriefing();
+}
+$('#lgSolo').addEventListener('click',()=>{
+  NB.mode='solo'; $('#lgSolo').classList.add('act'); $('#lgTeam').classList.remove('act'); $('#lgTeamName').style.display='none';
+});
+$('#lgTeam').addEventListener('click',()=>{
+  NB.mode='team'; $('#lgTeam').classList.add('act'); $('#lgSolo').classList.remove('act'); $('#lgTeamName').style.display='';
+});
+$('#lgSkip').addEventListener('click',()=>{ NB.code=''; saveNb(); beginGame(); });
+$('#lgStart').addEventListener('click',()=>{
+  const nm=$('#lgName').value.trim(), code=$('#lgCode').value.trim().toUpperCase();
+  const err=$('#lgErr');
+  if(!nm){ err.textContent='이름을 입력하세요.'; return; }
+  if(!code){ err.textContent='수업코드를 입력하세요. (혼자 연습은 아래 링크)'; return; }
+  if(NB.mode==='team' && !$('#lgTeamName').value.trim()){ err.textContent='팀 이름을 입력하세요.'; return; }
+  NB.name=nm; NB.code=code; NB.team=NB.mode==='team'?$('#lgTeamName').value.trim():''; saveNb();
+  err.textContent=''; beginGame();
+});
+
+/* ---------- 결과 저장 / 순위판 (수업코드 공유) ---------- */
+const API='/api/results';
+let RANK={rows:[],tab:'indiv',saved:false};
+async function saveResult(){
+  if(!NB.code) return {skip:true};
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code:NB.code,name:NB.name,team:NB.team,data:SOLOMON_RESULT()})});
+    if(res.status===503) return {noDb:true};
+    if(!res.ok) return {err:true};
+    RANK.saved=true; return {ok:true};
+  }catch(e){ return {err:true}; }
+}
+async function fetchRank(){
+  if(!NB.code) return {noCode:true};
+  try{
+    const res=await fetch(API+'?code='+encodeURIComponent(NB.code));
+    if(res.status===503) return {noDb:true};
+    if(!res.ok) return {err:true};
+    const j=await res.json(); RANK.rows=j.rows||[]; return {ok:true};
+  }catch(e){ return {err:true}; }
+}
+function renderRank(){
+  const box=$('#rankList');
+  const rows=RANK.rows.filter(r=>r&&r.data);
+  if(!rows.length){ box.innerHTML='<div class="rank-empty">아직 제출한 친구가 없어요.<br>수사를 끝내면 자동으로 여기에 올라와요!</div>'; return; }
+  let list;
+  if(RANK.tab==='team'){
+    const teams={};
+    rows.forEach(r=>{ const t=r.team||'(개인)'; (teams[t]=teams[t]||[]).push(r.data.total||0); });
+    list=Object.keys(teams).map(t=>({nm:t,team:'',score:Math.round(teams[t].reduce((a,b)=>a+b,0)/teams[t].length),n:teams[t].length}));
+  }else{
+    list=rows.map(r=>({nm:r.name||'?',team:r.team||'',score:r.data.total||0,indict:r.data.indictScore||0,me:r.name===NB.name}));
+  }
+  list.sort((a,b)=>b.score-a.score);
+  const medal=i=>['🥇','🥈','🥉'][i]||(i+1);
+  box.innerHTML=list.map((r,i)=>
+    '<div class="rkrow'+(r.me?' me':'')+'"><span class="rk-medal">'+medal(i)+'</span>'+
+    '<span class="rk-nm">'+esc(r.nm)+(r.team?'<span class="rk-team">'+esc(r.team)+'</span>':'')+
+      (RANK.tab==='team'?'<span class="rk-team">'+r.n+'명</span>':'')+'</span>'+
+    '<span class="rk-sc"><span class="big">'+r.score+'</span><span class="sub">'+
+      (RANK.tab==='team'?'팀 평균':'종합 · 기소장 '+(r.indict||0))+'</span></span></div>').join('');
+}
+async function openRank(){
+  $('#rankBg').classList.add('on');
+  $('#rankCode').textContent=NB.code?('· '+NB.code):'';
+  $('#rankList').innerHTML='<div class="rank-empty">불러오는 중…</div>';
+  const rr=await fetchRank();
+  if(rr.noCode){ $('#rankList').innerHTML='<div class="rank-empty">수업코드로 로그인하면<br>친구들과 순위를 겨룰 수 있어요.</div>'; return; }
+  if(rr.noDb){ $('#rankList').innerHTML='<div class="rank-empty">순위판 서버가 아직 연결되지 않았어요.<br>(선생님: Vercel에 Upstash를 연결하면 켜집니다)</div>'; return; }
+  if(rr.err){ $('#rankList').innerHTML='<div class="rank-empty">불러오지 못했어요. ↻ 새로고침을 눌러보세요.</div>'; return; }
+  renderRank();
+}
+$('#rankFab').addEventListener('click',openRank);
+$('#rankX').addEventListener('click',()=>$('#rankBg').classList.remove('on'));
+$('#rankBg').addEventListener('click',e=>{ if(e.target.id==='rankBg')$('#rankBg').classList.remove('on'); });
+$('#rkIndiv').addEventListener('click',()=>{ RANK.tab='indiv'; $('#rkIndiv').classList.add('act'); $('#rkTeam').classList.remove('act'); renderRank(); });
+$('#rkTeam').addEventListener('click',()=>{ RANK.tab='team'; $('#rkTeam').classList.add('act'); $('#rkIndiv').classList.remove('act'); renderRank(); });
+$('#rkRefresh').addEventListener('click',openRank);
+
+document.getElementById('startBtn').addEventListener('click',()=>{
+  $('#lgName').value=NB.name||''; $('#lgCode').value=NB.code||'';
+  if(NB.team){ NB.mode='team'; $('#lgTeam').click(); $('#lgTeamName').value=NB.team; }
+  $('#loginBg').classList.add('on');
 });
 </script>
 </body>
