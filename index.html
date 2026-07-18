@@ -661,7 +661,7 @@ h1,h2,h3,p{margin:0}
   text-shadow:0 4px 22px rgba(224,96,74,.6);transform:rotate(-6deg);animation:discPop 1s ease forwards}
 
 /* ==== 장면 전환 오버레이 ==== */
-.stagepass{position:fixed;inset:0;z-index:210;background:rgba(5,3,1,.96);display:none;
+.stagepass{position:fixed;inset:0;z-index:240;background:rgba(5,3,1,.96);display:none;
   align-items:center;justify-content:center;padding:20px}
 .stagepass.on{display:flex;animation:fade .35s}
 .sp-in{text-align:center;max-width:500px}
@@ -704,10 +704,41 @@ h1,h2,h3,p{margin:0}
   margin:6px 0;line-height:1.65;background:rgba(232,176,75,.04)}
 .hinttx.show{display:block;animation:fade .3s}
 
-/* ==== 기소장 작성 ==== */
-.ind-form{border:1px solid var(--gold-soft);border-radius:14px;padding:16px;background:rgba(232,176,75,.04)}
-.ind-row{font-size:13.5px;margin-bottom:6px}
-.ind-lb{display:inline-block;font-size:11.5px;color:var(--gold-soft);font-family:var(--fontm);margin-right:10px;letter-spacing:.06em}
+/* ==== 기소장 (실제 공소장 양식 · 전체 화면 서류) ==== */
+.docview{position:fixed;inset:0;z-index:215;background:rgba(4,3,1,.92);display:none;overflow-y:auto;padding:26px 14px}
+.docview.on{display:block;animation:fade .3s}
+.paper{position:relative;max-width:680px;margin:0 auto 40px;background:linear-gradient(180deg,#f7f0de,#efe5c9);
+  color:#2a2116;border-radius:6px;padding:40px 36px 30px;
+  font-family:'Noto Serif KR','Nanum Myeongjo','Batang','바탕',serif;
+  box-shadow:0 30px 80px rgba(0,0,0,.75);border:1px solid #d8c9a4}
+.doc-x{position:absolute;top:10px;right:12px;font-size:18px;color:#7a6a4f;padding:6px}
+.p-title{text-align:center;font-size:30px;font-weight:900;letter-spacing:18px;text-indent:18px;margin-bottom:24px;
+  border-bottom:3px double #2a2116;padding-bottom:16px}
+.p-meta{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px}
+.p-meta th{width:80px;text-align:left;font-weight:700;padding:8px 4px;vertical-align:middle;white-space:nowrap}
+.p-meta td{padding:8px 4px;border-bottom:1px solid rgba(42,33,22,.22)}
+.p-in,.p-sel{font-family:inherit;font-size:14px;color:#2a2116;background:transparent;border:none;
+  border-bottom:1.5px solid #8a7550;padding:4px 6px;min-width:160px;max-width:100%}
+.p-sel{cursor:pointer}
+.p-in:focus,.p-sel:focus{outline:none;border-bottom-color:#2a2116;background:rgba(138,117,80,.08)}
+.p-bad{border-bottom-color:#b5262a !important;background:rgba(181,38,42,.1) !important}
+.p-h{font-weight:900;font-size:15px;letter-spacing:6px;margin:22px 0 12px;border-top:2px solid #2a2116;padding-top:14px}
+.p-body{font-size:14.5px;line-height:2.2}
+.p-sign{text-align:right;font-size:14.5px;margin-top:28px;line-height:2}
+.p-stamp{position:absolute;right:38px;bottom:110px;width:76px;height:76px;border:3.5px solid #b5262a;border-radius:50%;
+  color:#b5262a;font-weight:900;font-size:21px;display:none;align-items:center;justify-content:center;text-align:center;
+  transform:rotate(-12deg);line-height:1.15;background:rgba(181,38,42,.05);font-family:inherit}
+.p-stamp.on{display:flex;animation:spPop .5s ease}
+.paper .ind-ev{background:#fbf5e6;border-color:#c9b48a;color:#2a2116}
+.paper .ind-ev:hover{border-color:#8a7550}
+.paper .ind-ev.sel{background:#efe0b6;border-color:#8a7550;box-shadow:inset 0 0 0 1px #8a7550}
+.paper .ind-rsn textarea{background:#fffdf4;border-color:#c9b48a;color:#2a2116}
+.paper .ind-rsn .rl{color:#6d5c41}
+.paper .hintbtn{color:#8a6d3a;border-color:#b59a68;background:transparent}
+.paper .hinttx{color:#5d4e35;border-left-color:#b59a68;background:rgba(138,117,80,.08)}
+.paper .result{background:rgba(181,38,42,.07);border-color:#b5262a;color:#8c2024}
+.paper .result.ok{background:rgba(47,125,58,.1);border-color:#2f7d3a;color:#245a2c}
+@media(max-width:560px){.paper{padding:26px 16px 24px}.p-title{letter-spacing:10px;font-size:24px}}
 .ind-evs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .ind-ev{font-size:12.5px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
   background:var(--panel2);cursor:pointer;transition:.12s}
@@ -846,19 +877,38 @@ h1,h2,h3,p{margin:0}
       </div>
       <div class="accuse-hint" id="accuseHint" style="display:none"></div>
 
-      <!-- 3부 · 기소장 작성 -->
-      <div id="indictWrap" style="display:none">
-        <h3 style="color:var(--gold);margin:20px 0 6px">📜 3부 · 기소장 작성</h3>
-        <p style="font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:10px">
-        <b>증거 3개</b>를 골라, 각 증거가 왜 피고인을 가리키는지 <b>양식에 맞춰 직접</b> 쓰세요.</p>
-        <div class="ind-form">
-          <div class="ind-row"><span class="ind-lb">피고인</span><b style="color:var(--danger)">강도훈 (검사 출신 변호사)</b></div>
-          <div class="ind-row"><span class="ind-lb">죄명</span>증거인멸 및 절도 (증거 USB 은닉)</div>
-          <div class="ind-lb" style="margin:10px 0 6px">첨부 증거 — <b>3개</b>를 고르세요 <span id="indPickCount" style="font-family:var(--fontm)">0 / 3</span></div>
+      <!-- 3부 · 기소장 작성 (별도 전체 화면 · 실제 공소장 양식) -->
+      <div class="docview" id="indictWrap">
+        <div class="paper">
+          <button class="doc-x" id="indX">✕</button>
+          <div class="p-title">공 소 장</div>
+          <table class="p-meta">
+            <tr><th>사건번호</th><td>2026고단 1147호</td></tr>
+            <tr><th>검&nbsp;&nbsp;&nbsp;사</th><td><input class="p-in" id="pProsecutor" placeholder="여러분의 이름을 쓰세요" maxlength="20"></td></tr>
+            <tr><th>피고인</th><td><select class="p-sel" id="pWho">
+              <option value="">— 선택 —</option><option value="dohoon">강도훈 (37 · 변호사)</option>
+              <option value="seoyeon">정서연 (29 · 법정 속기사)</option><option value="cheolung">박철웅 (45 · 법원 경위)</option>
+              <option value="junhyeok">이준혁 (25 · 대학원생)</option></select></td></tr>
+            <tr><th>죄&nbsp;&nbsp;&nbsp;명</th><td><select class="p-sel" id="pCharge">
+              <option value="">— 선택 —</option><option value="theft">절도 및 증거인멸</option>
+              <option value="fraud">사기</option><option value="defame">명예훼손</option><option value="assault">폭행</option></select></td></tr>
+            <tr><th>적용법조</th><td>형법 제329조(절도) · 제155조(증거인멸)</td></tr>
+          </table>
+          <div class="p-h">공 소 사 실</div>
+          <p class="p-body">피고인은 2026년 7월 8일
+            <select class="p-sel" id="pTime"><option value="">— 시각 —</option><option value="0900">아침 9시</option>
+            <option value="1230">낮 12시 30분</option><option value="2200">밤 10시</option><option value="2347">밤 11시 47분</option></select>경
+            솔로몬 법정에서, 재판의 핵심 증거인
+            <select class="p-sel" id="pItem"><option value="">— 물건 —</option><option value="mug">커피잔</option>
+            <option value="usb">증거 USB</option><option value="jacket">가죽 자켓</option><option value="file">기밀 문서</option></select>
+            을(를) 몰래 빼내어 금고에 숨기고, 증거 목록을 찢어 없애는 방법으로 증거를 인멸하려 하였다.</p>
+          <div class="p-h">입 증 방 법 <span id="indPickCount" style="letter-spacing:0;font-size:12.5px">0 / 3</span></div>
           <div class="ind-evs" id="indEvs"></div>
           <div id="indReasons"></div>
-          <div class="center mt"><button class="btn" id="indSubmit">⚖️ 기소장 제출</button></div>
+          <div class="p-sign">2026년 7월 9일<br>검사 <span id="pSignNm">＿＿＿</span> <span>㊞</span></div>
+          <div class="p-stamp" id="pStamp">인<br>가</div>
           <div class="result" id="res-indict"></div>
+          <div class="center mt"><button class="btn" id="indSubmit">⚖️ 기소장 제출</button></div>
         </div>
       </div>
 
@@ -1910,11 +1960,11 @@ window.accuse=function(id){
     S.accused=true;
     SUSPECTS.forEach(x=>{ const el=$('#susp-'+x.id); el.classList.remove('pickable','low','top'); el.onclick=null; });
     $('#susp-'+id).classList.add('guilty');
-    ah.innerHTML='🎯 <b style="color:var(--ok)">정답! 강도훈이 진범입니다.</b> 지문과 혈흔, 두 직접 증거가 겹치는 단 한 사람이에요. 이제 <b>기소장</b>을 작성해 재판에 넘기세요!';
-    $('#indictWrap').style.display='block';
+    ah.innerHTML='🎯 <b style="color:var(--ok)">정답! 강도훈이 진범입니다.</b><br><button class="btn" style="margin-top:12px" onclick="openIndict()">📜 공소장(기소장) 작성 ▶</button>';
     buildIndict();
-    setTimeout(()=>$('#indictWrap').scrollIntoView({behavior:'smooth',block:'center'}),200);
-    toast('지목 성공! 기소장을 작성하세요');
+    showPass({ico:'📜',t:'진범 지목 성공!',
+      d:'이제 검사가 되어 <b>공소장(기소장)</b>을 작성할 차례.<br>실제 법원에서 쓰는 양식을 직접 채워 재판에 넘기세요!',
+      btn:'📜 공소장 작성 ▶',cb:openIndict});
   }else{
     S.wrongAccuse=(S.wrongAccuse||0)+1;
     const el=$('#susp-'+id); el.classList.add('cleared'); setTimeout(()=>el.classList.remove('cleared'),550);
@@ -1932,10 +1982,18 @@ const INDICT_EV=[
  {k:'lie',lb:'⚡ 심문 모순 — "커피 안 마셨다" 거짓 진술',direct:false}
 ];
 const IND={sel:new Set()};
+window.openIndict=function(){ if(!S.accused)return; $('#indictWrap').classList.add('on'); sfx('tick'); };
+function closeIndict(){ $('#indictWrap').classList.remove('on'); }
+$('#indX').addEventListener('click',()=>{ closeIndict(); if(!S.indict) toast('지목 카드의 [공소장 작성] 버튼으로 다시 열 수 있어요'); });
 function buildIndict(){
   $('#indEvs').innerHTML=INDICT_EV.map((e,i)=>
     '<span class="ind-ev" id="indev-'+i+'" onclick="togEv('+i+')">'+e.lb+'</span>').join('');
   renderIndReasons();
+  const pn=$('#pProsecutor');
+  pn.value=NB.name||'';
+  $('#pSignNm').textContent=NB.name||'＿＿＿';
+  pn.addEventListener('input',()=>{ NB.name=pn.value.trim(); saveNb(); $('#pSignNm').textContent=NB.name||'＿＿＿'; pn.classList.remove('p-bad'); });
+  ['pWho','pCharge','pTime','pItem'].forEach(id=>$('#'+id).addEventListener('change',e=>e.target.classList.remove('p-bad')));
 }
 window.togEv=function(i){
   if(S.indict)return;
@@ -1968,7 +2026,22 @@ window.togHint=function(b){ b.nextElementSibling.classList.toggle('show'); };
 $('#indSubmit').addEventListener('click',()=>{
   if(S.indict)return;
   const r=$('#res-indict');
-  if(IND.sel.size!==3){ r.className='result show'; r.innerHTML='⚖️ 판사: "첨부 증거는 <b>정확히 3개</b>여야 합니다."'; sfx('wrong'); return; }
+  const bad=(id,cond)=>{ $('#'+id).classList.toggle('p-bad',cond); return cond; };
+  const pname=$('#pProsecutor').value.trim();
+  if(bad('pProsecutor',!pname)){
+    r.className='result show'; r.innerHTML='⚖️ 반려 — <b>검사(여러분) 이름</b>을 쓰세요.'; sfx('wrong'); return;
+  }
+  let wrongForm=false;
+  wrongForm=bad('pWho',$('#pWho').value!=='dohoon')||wrongForm;
+  wrongForm=bad('pCharge',$('#pCharge').value!=='theft')||wrongForm;
+  wrongForm=bad('pTime',$('#pTime').value!=='2347')||wrongForm;
+  wrongForm=bad('pItem',$('#pItem').value!=='usb')||wrongForm;
+  if(wrongForm){
+    r.className='result show';
+    r.innerHTML='⚖️ 반려 — <b>붉게 표시된 칸</b>이 사건 기록과 다릅니다. 수사 결과를 떠올려 다시 채우세요.';
+    sfx('wrong'); return;
+  }
+  if(IND.sel.size!==3){ r.className='result show'; r.innerHTML='⚖️ 반려 — 입증 방법(첨부 증거)은 <b>정확히 3개</b>여야 합니다.'; sfx('wrong'); return; }
   const keys=[...IND.sel].map(i=>INDICT_EV[i].k);
   if(!keys.includes('print')||!keys.includes('blood')){
     r.className='result show';
@@ -1979,19 +2052,24 @@ $('#indSubmit').addEventListener('click',()=>{
   $('#indReasons').querySelectorAll('textarea').forEach(t=>{ reasons[t.dataset.k]=t.value.trim(); if(t.value.trim().length<8) tooShort=true; });
   if(tooShort){
     r.className='result show';
-    r.innerHTML='⚖️ 판사: "근거 서술이 부족합니다. 각 증거가 <b>왜 피고인을 가리키는지</b> 문장으로 쓰세요. (8자 이상)"';
+    r.innerHTML='⚖️ 반려 — 근거 서술이 부족합니다. 양식에 맞춰 <b>문장으로</b> 쓰세요. (8자 이상)';
     sfx('wrong'); return;
   }
-  S.indict={evs:keys,reasons:reasons};
+  S.indict={who:'dohoon',charge:'절도 및 증거인멸',time:'23:47',item:'증거 USB',prosecutor:pname,evs:keys,reasons:reasons};
   r.className='result ok show';
-  r.innerHTML='✅ ⚖️ 판사: "기소를 <b>인가</b>합니다. 직접 증거와 논리적 근거가 갖춰졌습니다."';
-  $('#indSubmit').disabled=true; sfx('win'); addScore(20);
-  $('#aiVerdict').style.display='block';
-  $('#verdictText').innerHTML='🚨 <b>기소 성공!</b> 수사의 흐름을 되짚어 봐요 — <b>필적</b>로 메모 작성자(박철웅)를 확인하되 단정하지 않았고, '+
-    '<b>혈흔·DNA</b>로 후보를 좁혔고, <b>심문</b>으로 거짓 진술을 무너뜨렸고, <b>지문 대조</b>가 강도훈을 확정했어요. 이제 금고를 열어 USB를 되찾으세요!';
-  buildPad();
-  setTimeout(()=>$('#aiVerdict').scrollIntoView({behavior:'smooth'}),300);
-  toast('기소 인가! 금고 암호를 유추해 입력하세요');
+  r.innerHTML='✅ ⚖️ 판사: "공소사실과 입증 방법이 갖춰졌으므로 기소를 <b>인가</b>합니다."';
+  $('#indSubmit').disabled=true;
+  $('#pStamp').classList.add('on'); sfx('win'); addScore(20);
+  setTimeout(()=>showPass({ico:'⚖️',t:'기소 인가!',
+    d:'검사 <b>'+pname+'</b>의 공소장이 접수됐습니다.<br>이제 금고를 열어 <b>증거 USB</b>를 되찾으세요!',
+    btn:'🔒 금고 열기 ▶',
+    cb:()=>{ closeIndict();
+      $('#aiVerdict').style.display='block';
+      $('#verdictText').innerHTML='🚨 <b>기소 성공!</b> 필적로 작성자를 확인하되 단정하지 않았고, 혈흔·DNA로 후보를 좁혔고, '+
+        '심문으로 거짓 진술을 무너뜨렸고, <b>지문 대조</b>가 강도훈을 확정했어요. 마지막 — 금고 암호를 유추해 여세요!';
+      buildPad();
+      setTimeout(()=>$('#aiVerdict').scrollIntoView({behavior:'smooth'}),250);
+    }}),1100);
 });
 function buildPad(){
   const pad=$('#pad'); pad.innerHTML='';
