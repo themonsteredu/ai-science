@@ -1,69 +1,63 @@
 // 솔로몬 법정 · 수업코드별 결과 저장/조회 API
-// DB: Upstash Redis (Vercel Marketplace에서 Upstash 연결 시 아래 env가 자동 주입됩니다)
-//   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
-//   (Vercel KV를 쓰면 KV_REST_API_URL / KV_REST_API_TOKEN 도 인식)
-// 데이터 구조: HSET solomon:class:{수업코드} {학생이름} = 결과 JSON (90일 후 자동 삭제)
+//
+// POST — 학생이 수사를 끝내면 결과를 올립니다 (인증 없음: 아이들이 제출해야 하므로)
+// GET  — 반 전체 결과를 조회합니다
+//        · 순위판용(이름·점수만)은 인증 없이  → ?code=5A반
+//        · 전문(수첩 메모·기소장 서술 포함)은 교사 PIN 필요 → ?code=5A반&pin=...&full=1
+//
+// 저장소 설정과 필요한 테이블은 api/_db.js 주석을 보세요.
+
+const db = require('./_db');
 
 const MAX_BODY = 20000;
 
-function env() {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-  return url && token ? { url: url, token: token } : null;
-}
-
-async function redis(cmds) {
-  const e = env();
-  const r = await fetch(e.url + '/pipeline', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + e.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(cmds),
-  });
-  if (!r.ok) throw new Error('redis ' + r.status);
-  return r.json();
-}
-
-// 앞뒤 공백 제거 후 n자로 자르고, 홑화살괄호만 제거(XSS 방지)
-function clean(s, n) {
-  return String(s == null ? '' : s).trim().slice(0, n).replace(/[<>]/g, '');
+// 순위판에 필요한 값만 남긴다 — 아이가 쓴 메모·서술은 내보내지 않는다
+function publicRow(r) {
+  const d = r.data || {};
+  return {
+    name: r.name,
+    team: r.team || null,
+    savedAt: r.savedAt || null,
+    data: {
+      total: d.total || 0,
+      indictScore: d.indictScore || 0,
+      quizScore: d.quizScore || 0,
+      deduceScore: d.deduceScore || 0,
+    },
+  };
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (db.prelude(req, res)) return;
 
-  if (!env()) return res.status(503).json({ error: 'no-db' });
+  if (!db.backend()) return res.status(503).json({ error: 'no-db', diag: db.diag() });
 
   try {
     if (req.method === 'POST') {
-      const b = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const code = clean(b.code, 24).toUpperCase();
-      const name = clean(b.name, 20);
+      const b = db.body(req);
+      const code = db.clean(b.code, 24).toUpperCase();
+      const name = db.clean(b.name, 20);
       if (!code || !name) return res.status(400).json({ error: 'code와 name이 필요합니다' });
-      const row = JSON.stringify({
+      const row = {
         name: name,
-        team: clean(b.team, 20) || null,
-        savedAt: Date.now(),
+        team: db.clean(b.team, 20) || null,
         data: b.data || {},
-      });
-      if (row.length > MAX_BODY) return res.status(413).json({ error: 'too-big' });
-      const key = 'solomon:class:' + code;
-      await redis([['HSET', key, name, row], ['EXPIRE', key, 60 * 60 * 24 * 90]]);
+      };
+      if (JSON.stringify(row).length > MAX_BODY) return res.status(413).json({ error: 'too-big' });
+      await db.putResult(code, row);
       return res.status(200).json({ ok: true });
     }
 
     if (req.method === 'GET') {
-      const code = clean(req.query.code, 24).toUpperCase();
+      const code = db.clean(req.query.code, 24).toUpperCase();
       if (!code) return res.status(400).json({ error: 'code가 필요합니다' });
-      const out = await redis([['HGETALL', 'solomon:class:' + code]]);
-      const flat = (out && out[0] && out[0].result) || [];
-      const rows = [];
-      for (let i = 0; i < flat.length; i += 2) {
-        try { rows.push(JSON.parse(flat[i + 1])); } catch (e) { /* skip corrupt row */ }
+      const rows = await db.listResults(code);
+      // 전문 조회는 교사 PIN 이 있어야 한다 (수첩 메모·기소장 서술이 들어 있으므로)
+      if (req.query.full) {
+        if (!db.pinOk(req.query.pin)) return res.status(403).json({ error: 'bad-pin' });
+        return res.status(200).json({ rows: rows, full: true });
       }
-      return res.status(200).json({ rows: rows });
+      return res.status(200).json({ rows: rows.map(publicRow) });
     }
 
     return res.status(405).json({ error: 'method' });

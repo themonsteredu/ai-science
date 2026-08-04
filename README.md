@@ -66,17 +66,41 @@ HTML 안에 해시로 들어 있어 소스를 훑어보는 정도로는 안 보�
 
 > ⚠️ 이 문서는 아이들과 공유하지 마세요.
 
-## 서버 설정 (Vercel)
+## 서버 설정 (Vercel + Supabase)
 
-순위판과 진도 제어를 쓰려면 두 가지가 필요합니다.
+순위판과 진도 제어를 쓰려면 세 가지가 필요합니다.
 
 | 항목 | 설정 |
 |---|---|
-| DB | Vercel Marketplace에서 **Upstash Redis** 연결 (`UPSTASH_REDIS_REST_URL` / `_TOKEN` 자동 주입) |
+| DB | **Supabase** 프로젝트 (아래 SQL 로 테이블 2개 생성) |
+| 환경변수 | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API 에서 복사) |
 | 교사 PIN | 환경변수 **`TEACHER_PIN`** 에 원하는 값 설정 |
 
-`TEACHER_PIN` 은 **서버에만** 있어서 학생이 HTML 소스를 봐도 알 수 없습니다.
-설정하지 않으면 서버 방식으로 단계를 열 수 없습니다(오프라인 암호는 그대로 동작).
+Supabase → **SQL Editor** 에서 한 번 실행:
+
+```sql
+create table if not exists solomon_gate (
+  code text primary key,
+  stage int not null default 0,
+  updated_at timestamptz not null default now()
+);
+create table if not exists solomon_results (
+  code text not null,
+  name text not null,
+  team text,
+  data jsonb not null default '{}',
+  saved_at timestamptz not null default now(),
+  primary key (code, name)
+);
+alter table solomon_gate enable row level security;
+alter table solomon_results enable row level security;
+```
+
+> RLS 를 정책 없이 켜 두면 외부(anon 키)에서는 접근이 막히고, 서버의 service_role 키만 통과합니다.
+
+`SUPABASE_SERVICE_ROLE_KEY` 와 `TEACHER_PIN` 은 **서버에만** 있어서 학생이 HTML 소스를 봐도 알 수 없습니다.
+`TEACHER_PIN` 을 설정하지 않으면 서버 방식으로 단계를 열 수 없습니다(오프라인 암호는 그대로 동작).
+(Upstash Redis 의 `UPSTASH_REDIS_REST_URL`/`_TOKEN` 이 있으면 그쪽도 그대로 인식합니다 — 하위 호환.)
 
 ### 설정 확인 — `/api/gate?diag=1`
 
@@ -88,9 +112,10 @@ HTML 안에 해시로 들어 있어 소스를 훑어보는 정도로는 안 보�
 
 | 증상 | 뜻 | 조치 |
 |---|---|---|
-| `db: false`, `found: []` | Redis 미연결 | Upstash Redis 연결 후 **재배포** |
-| `db: false`, `found: ["REDIS_URL"]` | Redis 는 있지만 REST 주소·토큰이 없음 | Upstash 통합에서 REST API 변수를 노출하도록 다시 연결 |
+| `db: false`, `found: []` | DB 미연결 | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` 등록 후 **재배포** |
+| `db: false`, `found` 에 `DATABASE_URL` 등만 있음 | 접속 문자열만 있고 REST 용 변수가 없음 | 위 두 변수를 Supabase → Settings → API 에서 복사해 등록 |
 | `db: true`, `teacherPin: false` | PIN 미설정 | `TEACHER_PIN` 설정 후 **재배포** |
+| `backend` | 지금 쓰는 저장소 (`supabase` 또는 `redis`) | — |
 
 > **DB 가 없으면 PIN 이 맞아도 거부됩니다.** `api/gate.js` 가 DB 확인을 PIN 확인보다 먼저 하기 때문입니다.
 > 이때 교사 창은 "DB 가 연결되지 않았다"고 알려주고, 오프라인 암호로 기기별 해제만 가능합니다.
@@ -101,12 +126,16 @@ DB를 연결하지 않으면 순위판과 서버 진도 제어만 비활성화�
 
 | API | 용도 |
 |---|---|
-| `GET/POST /api/results` | 수업코드별 결과 저장·조회 (순위판) |
+| `POST /api/results` | 학생 결과 제출 |
+| `GET /api/results?code=…` | 순위판 조회 — **이름·점수만** 내려갑니다 (메모·서술 제외) |
+| `GET /api/results?code=…&full=1&pin=…` | 전문 조회(수첩 메모·기소장 서술 포함) — **교사 PIN 필요** |
 | `GET /api/gate?code=…` | 열린 단계 조회 (학생이 폴링) |
+| `GET /api/gate?diag=1` | 서버 설정 진단 |
 | `POST /api/gate` | 단계 설정 — **교사 PIN 필요** |
 
-> ⚠️ `/api/results` 에는 인증이 없습니다. 수업코드만 알면 누구나 반 전체 결과를 읽고 덮어쓸 수 있고,
-> 저장 내용에 아이가 쓴 수첩 메모와 기소장 서술이 포함됩니다. 수업코드를 외부에 공유하지 마세요.
+> 순위판 조회는 인증이 없지만 이름과 점수만 내려갑니다. 아이가 쓴 수첩 메모·기소장 서술 전문은
+> 교사 PIN 이 있어야 볼 수 있습니다. 제출(POST)은 아이들이 해야 하므로 인증이 없습니다 —
+> 같은 이름으로 제출하면 덮어써지니, 수업코드를 외부에 공유하지 않는 것은 여전히 중요합니다.
 
 ## 기술
 

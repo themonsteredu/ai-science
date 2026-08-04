@@ -1,105 +1,41 @@
 // 솔로몬 법정 · 수업코드별 진도 잠금(게이트) API
 // 교사가 단계를 열면 그 수업코드로 접속한 학생 화면이 모두 함께 열립니다.
 //
-// 단계: 0 = 현장 조사만 / 1 = 과학 수사 / 2 = AI 분석·기소장 / 3 = 마무리(모의 재판·최종 보고)
+// 단계: 0 = 현장 조사만 / 1 = 과학 수사 / 2 = AI 분석·기소장 / 3 = 마무리
 //
-// DB: Upstash Redis (Vercel Marketplace에서 Upstash 연결 시 env 자동 주입)
-//   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN  (Vercel KV의 KV_REST_API_* 도 인식)
-// 데이터 구조: SET solomon:gate:{수업코드} = "0"~"3"  (12시간 후 자동 삭제 → 수업이 끝나면 저절로 닫힘)
-//
-// 교사 PIN은 Vercel 환경변수 TEACHER_PIN 에 둡니다.
-// HTML에 넣지 않는 것이 핵심입니다 — 학생이 소스를 봐도 알 수 없습니다.
-// TEACHER_PIN을 설정하지 않으면 단계를 여는 POST가 항상 거부됩니다(잠금 해제 불가).
+// 저장소 설정과 필요한 테이블은 api/_db.js 주석을 보세요.
+// 교사 PIN 은 환경변수 TEACHER_PIN 에 둡니다 — 서버에만 있으므로 학생이
+// HTML 소스를 봐도 알 수 없습니다. 설정하지 않으면 단계를 열 수 없습니다.
+
+const db = require('./_db');
 
 const MAX_STAGE = 3;
-const TTL = 60 * 60 * 12;
-
-// REST 방식으로 쓸 수 있는 https URL + 토큰 조합을 찾는다.
-// (rediss:// 로 시작하는 REDIS_URL 만 있으면 REST 호출이 안 되므로 진단에서 알려준다)
-const URL_KEYS = ['UPSTASH_REDIS_REST_URL', 'KV_REST_API_URL'];
-const TOKEN_KEYS = ['UPSTASH_REDIS_REST_TOKEN', 'KV_REST_API_TOKEN'];
-const HINT_KEYS = ['REDIS_URL', 'KV_URL', 'UPSTASH_REDIS_URL', 'REDIS_TOKEN'];
-
-function env() {
-  const url = URL_KEYS.map(k => process.env[k]).find(Boolean);
-  const token = TOKEN_KEYS.map(k => process.env[k]).find(Boolean);
-  return url && token && /^https?:\/\//.test(url) ? { url: url, token: token } : null;
-}
-
-// 어떤 변수가 들어와 있는지 이름만 알려준다 (값은 절대 내보내지 않는다)
-function diag() {
-  const seen = k => !!process.env[k];
-  return {
-    db: !!env(),
-    teacherPin: !!process.env.TEACHER_PIN,
-    found: URL_KEYS.concat(TOKEN_KEYS, HINT_KEYS).filter(seen),
-    hint: !env()
-      ? (HINT_KEYS.some(seen)
-          ? 'Redis 가 연결돼 있지만 REST 주소·토큰이 없습니다. Upstash 통합에서 REST API(UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)를 노출하도록 다시 연결하세요.'
-          : 'Vercel Marketplace 에서 Upstash Redis 를 연결한 뒤 재배포하세요.')
-      : (process.env.TEACHER_PIN ? '정상입니다.' : '환경변수 TEACHER_PIN 을 설정한 뒤 재배포하세요.'),
-  };
-}
-
-async function redis(cmds) {
-  const e = env();
-  const r = await fetch(e.url + '/pipeline', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + e.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(cmds),
-  });
-  if (!r.ok) throw new Error('redis ' + r.status);
-  return r.json();
-}
-
-// 앞뒤 공백 제거 후 n자로 자르고, 홑화살괄호만 제거(XSS 방지)
-function clean(s, n) {
-  return String(s == null ? '' : s).trim().slice(0, n).replace(/[<>]/g, '');
-}
-
-// 길이가 달라도 같은 시간이 걸리게 비교 (PIN 추측 난이도를 낮추지 않기 위해)
-function pinOk(given) {
-  const want = process.env.TEACHER_PIN || '';
-  if (!want) return false;
-  const a = String(given == null ? '' : given);
-  if (a.length !== want.length) return false;
-  let diff = 0;
-  for (let i = 0; i < want.length; i++) diff |= a.charCodeAt(i) ^ want.charCodeAt(i);
-  return diff === 0;
-}
+const clampStage = v => Math.max(0, Math.min(MAX_STAGE, parseInt(v, 10) || 0));
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Cache-Control', 'no-store');
-  if (req.method === 'OPTIONS') return res.status(204).end();
+  if (db.prelude(req, res)) return;
 
-  // 설정 진단: /api/gate?diag=1  — 어떤 환경변수가 들어와 있는지 이름만 보여준다
-  if (req.method === 'GET' && req.query && req.query.diag) return res.status(200).json(diag());
+  // 설정 진단: /api/gate?diag=1 — 어떤 환경변수가 들어와 있는지 이름만 보여준다
+  if (req.method === 'GET' && req.query && req.query.diag) return res.status(200).json(db.diag());
 
-  if (!env()) return res.status(503).json({ error: 'no-db', diag: diag() });
+  if (!db.backend()) return res.status(503).json({ error: 'no-db', diag: db.diag() });
 
   try {
     if (req.method === 'GET') {
-      const code = clean(req.query.code, 24).toUpperCase();
+      const code = db.clean(req.query.code, 24).toUpperCase();
       if (!code) return res.status(400).json({ error: 'code가 필요합니다' });
-      const out = await redis([['GET', 'solomon:gate:' + code]]);
-      const raw = out && out[0] && out[0].result;
-      const stage = Math.max(0, Math.min(MAX_STAGE, parseInt(raw, 10) || 0));
-      return res.status(200).json({ stage: stage });
+      return res.status(200).json({ stage: clampStage(await db.getStage(code)) });
     }
 
     if (req.method === 'POST') {
-      const b = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-      const code = clean(b.code, 24).toUpperCase();
+      const b = db.body(req);
+      const code = db.clean(b.code, 24).toUpperCase();
       if (!code) return res.status(400).json({ error: 'code가 필요합니다' });
-      if (!pinOk(b.pin)) return res.status(403).json({ error: 'bad-pin' });
-      // 교사 로그인: PIN만 확인하고 단계는 바꾸지 않는다
+      if (!db.pinOk(b.pin)) return res.status(403).json({ error: 'bad-pin' });
+      // 교사 로그인: PIN 만 확인하고 단계는 바꾸지 않는다
       if (b.verify) return res.status(200).json({ ok: true, verified: true });
-      const stage = Math.max(0, Math.min(MAX_STAGE, parseInt(b.stage, 10) || 0));
-      const key = 'solomon:gate:' + code;
-      await redis([['SET', key, String(stage)], ['EXPIRE', key, TTL]]);
+      const stage = clampStage(b.stage);
+      await db.setStage(code, stage);
       return res.status(200).json({ ok: true, stage: stage });
     }
 
