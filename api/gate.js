@@ -71,6 +71,8 @@ module.exports = async (req, res) => {
       const code = clean(b.code, 24).toUpperCase();
       if (!code) return res.status(400).json({ error: 'code가 필요합니다' });
       if (!pinOk(b.pin)) return res.status(403).json({ error: 'bad-pin' });
+      // 교사 로그인: PIN만 확인하고 단계는 바꾸지 않는다
+      if (b.verify) return res.status(200).json({ ok: true, verified: true });
       const stage = Math.max(0, Math.min(MAX_STAGE, parseInt(b.stage, 10) || 0));
       const key = 'solomon:gate:' + code;
       await redis([['SET', key, String(stage)], ['EXPIRE', key, TTL]]);

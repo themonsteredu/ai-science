@@ -875,6 +875,12 @@ h1,h2,h3,p{margin:0}
 .tch-btns .tch-go{width:100%;justify-content:center}
 .tch-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}
 .tch-note b{color:var(--gold-soft)}
+.tch-enter{color:var(--ai);border-color:rgba(94,199,224,.4)}
+.tch-remember{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:10px 0 2px;cursor:pointer}
+.tch-remember input{width:16px;height:16px;accent-color:var(--gold)}
+.tch-who{font-size:12.5px;color:var(--ok);font-family:var(--fontm);margin-bottom:10px;text-align:center}
+/* 로그인 화면(z-index 250) 위에서도 열려야 한다 */
+#tchBg{z-index:260}
 .rank-tabs{display:flex;gap:8px;align-items:center;margin:6px 0 12px}
 .rk-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:#0c0904;
   color:var(--muted);font-size:13.5px;font-weight:700}
@@ -1223,26 +1229,40 @@ h1,h2,h3,p{margin:0}
     <div class="login-err" id="lgErr"></div>
     <button class="btn" id="lgStart" style="width:100%;justify-content:center;margin-top:6px">수사 시작 ▶</button>
     <button class="login-skip" id="lgSkip" type="button">코드 없이 혼자 연습하기</button>
+    <button class="login-skip tch-enter" id="lgTeacher" type="button">🧑‍🏫 선생님이신가요? — 교사 로그인</button>
   </div>
 </div>
 
-<!-- 교사용 진도 열기 (주소 끝에 ?t=1 을 붙였을 때만 보입니다) -->
+<!-- 교사용 진도 열기 — 로그인 화면의 "교사 로그인" 으로 들어옵니다 (?t=1 지름길도 유지) -->
 <button class="tch-fab" id="tchFab" style="display:none">🧑‍🏫 <span>진도 열기</span></button>
 <div class="dlg-bg" id="tchBg">
   <div class="dlg" style="max-width:460px">
     <button class="x" id="tchX">✕</button>
-    <div class="dlg-head">🧑‍🏫 교사용 · 진도 열기</div>
-    <div class="tch-now" id="tchNow">현재 열린 단계: —</div>
-    <label class="login-lb">수업코드</label>
-    <input class="login-in" id="tchCode" maxlength="24" placeholder="예: 5A반" autocomplete="off">
-    <label class="login-lb">교사 PIN <span class="login-hint">(서버에 설정한 값)</span></label>
-    <input class="login-in" id="tchPin" type="password" maxlength="32" placeholder="TEACHER_PIN" autocomplete="off">
-    <div class="tch-btns">
-      <button class="btn ghost cbtn tch-go" data-stage="1">① 과학 수사 열기</button>
-      <button class="btn ghost cbtn tch-go" data-stage="2">② AI 분석 · 기소장 열기</button>
-      <button class="btn ghost cbtn tch-go" data-stage="3">③ 마무리 열기</button>
-      <button class="btn ghost cbtn tch-go" data-stage="0">↺ 처음으로 되돌리기</button>
+    <div class="dlg-head">🧑‍🏫 교사 로그인</div>
+
+    <!-- 1단계: 로그인 -->
+    <div id="tchLogin">
+      <label class="login-lb">수업코드</label>
+      <input class="login-in" id="tchCode" maxlength="24" placeholder="예: 5A반" autocomplete="off">
+      <label class="login-lb">교사 PIN</label>
+      <input class="login-in" id="tchPin" type="password" maxlength="32" placeholder="선생님만 아는 값" autocomplete="off">
+      <label class="tch-remember"><input type="checkbox" id="tchSave"> 이 기기에 기억하기 <span class="login-hint">(내 폰·내 PC일 때만)</span></label>
+      <button class="btn" id="tchIn" style="width:100%;justify-content:center;margin-top:8px">로그인 ▶</button>
     </div>
+
+    <!-- 2단계: 진도 열기 -->
+    <div id="tchPanel" style="display:none">
+      <div class="tch-who" id="tchWho"></div>
+      <div class="tch-now" id="tchNow">현재 열린 단계: —</div>
+      <div class="tch-btns">
+        <button class="btn ghost cbtn tch-go" data-stage="1">① 과학 수사 열기</button>
+        <button class="btn ghost cbtn tch-go" data-stage="2">② AI 분석 · 기소장 열기</button>
+        <button class="btn ghost cbtn tch-go" data-stage="3">③ 마무리 열기</button>
+        <button class="btn ghost cbtn tch-go" data-stage="0">↺ 처음으로 되돌리기</button>
+      </div>
+      <button class="login-skip" id="tchOut" type="button">로그아웃</button>
+    </div>
+
     <div class="login-err" id="tchErr"></div>
     <div class="tch-note" id="tchNote"></div>
   </div>
@@ -2861,32 +2881,86 @@ function startGatePoll(){
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) fetchGate(); });
 }
 
+/* ---------- 교사 로그인 ----------
+   PIN 은 서버(TEACHER_PIN)에만 있어서 학생이 소스를 봐도 알 수 없다.
+   그래서 입구를 숨길 필요가 없고, 로그인 화면에 그냥 둔다. */
+const TCH={code:'',pin:'',on:false};
+try{ const sv=JSON.parse(localStorage.getItem('solomon_tch')||'null');
+     if(sv){ TCH.code=sv.code||''; TCH.pin=sv.pin||''; } }catch(e){}
+
+function tchShowPanel(on){
+  TCH.on=on;
+  $('#tchLogin').style.display=on?'none':'';
+  $('#tchPanel').style.display=on?'':'none';
+  if(on){
+    $('#tchFab').style.display='';
+    $('#tchWho').innerHTML='✅ <b>'+esc(TCH.code||'(수업코드 없음)')+'</b> 반 담당으로 로그인';
+    syncGateUI();
+  }
+}
+function tchOpen(){
+  $('#tchErr').textContent='';
+  $('#tchCode').value=TCH.code||NB.code||'';
+  $('#tchPin').value=TCH.pin||'';
+  $('#tchNote').innerHTML=gateNoDb
+    ? '서버가 연결되지 않았어요(오프라인). <b>PIN 칸에 단계별 해제 암호</b>를 넣으면 <b>이 기기만</b> 열립니다.'
+    : '단계를 열면 같은 수업코드로 접속한 <b>모든 학생 화면</b>이 15초 안에 함께 열립니다.';
+  tchShowPanel(TCH.on);
+  $('#tchBg').classList.add('on');
+}
+/* 기억해 둔 로그인이 있거나 ?t=1 지름길로 들어오면 진도 버튼을 바로 띄운다 */
+if(TCH.pin||/[?&]t=1\b/.test(location.search)) $('#tchFab').style.display='';
+if(TCH.pin) TCH.on=true;
+
+$('#tchX').addEventListener('click',()=>$('#tchBg').classList.remove('on'));
+$('#tchFab').addEventListener('click',tchOpen);
+$('#lgTeacher').addEventListener('click',tchOpen);
+
+/* 로그인 — 서버가 있으면 PIN 을 확인하고, 오프라인이면 단계 암호로 넘어간다 */
+$('#tchIn').addEventListener('click',async()=>{
+  const code=$('#tchCode').value.trim().toUpperCase(), pin=$('#tchPin').value;
+  const err=$('#tchErr'); err.textContent='';
+  if(!code){ err.textContent='수업코드를 입력하세요.'; return; }
+  if(!pin){ err.textContent='교사 PIN을 입력하세요.'; return; }
+  let verified=false;
+  try{
+    const r=await fetch(GATE_API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code:code,pin:pin,verify:true})});
+    if(r.status===403){ err.textContent='교사 PIN이 맞지 않습니다.'; return; }
+    if(r.status===503){ gateNoDb=true; }
+    else if(r.ok) verified=true;
+    else { err.textContent='서버 응답이 이상해요. 잠시 후 다시 시도하세요.'; return; }
+  }catch(e){ gateNoDb=true; }
+  if(!verified&&!gateNoDb){ err.textContent='로그인에 실패했어요.'; return; }
+  TCH.code=code; TCH.pin=pin;
+  if($('#tchSave').checked){ try{ localStorage.setItem('solomon_tch',JSON.stringify({code:code,pin:pin})); }catch(e){} }
+  if(gateNoDb) $('#tchNote').innerHTML='서버가 연결되지 않았어요(오프라인). 단계 버튼을 누르면 <b>PIN 칸의 값을 단계별 해제 암호로</b> 확인해 <b>이 기기만</b> 엽니다.';
+  tchShowPanel(true);
+});
+$('#tchOut').addEventListener('click',()=>{
+  TCH.code=''; TCH.pin=''; TCH.on=false;
+  try{ localStorage.removeItem('solomon_tch'); }catch(e){}
+  $('#tchPin').value=''; $('#tchErr').textContent='';
+  if(!/[?&]t=1\b/.test(location.search)) $('#tchFab').style.display='none';
+  tchShowPanel(false);
+});
+
 /* 오프라인(서버 없이 USB로 쓸 때) 폴백 암호 — 소스에서 바로 읽히지 않도록 해시로만 저장한다.
-   작정하고 찾으면 뚫리므로, 인터넷이 되는 교실에서는 위의 서버 방식(교사 PIN)을 쓰세요. */
+   작정하고 찾으면 뚫리므로, 인터넷이 되는 교실에서는 서버 방식(교사 PIN)을 쓰세요. */
 function h32(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36); }
 const GATE_FALLBACK=['','1mlzi4m','1co5pdl','m0cfhd'];
 
-$('#tchX').addEventListener('click',()=>$('#tchBg').classList.remove('on'));
-$('#tchFab').addEventListener('click',()=>{
-  $('#tchCode').value=$('#tchCode').value||NB.code||'';
-  $('#tchErr').textContent='';
-  $('#tchNote').innerHTML=gateNoDb||!NB.code
-    ? '서버가 연결되지 않았거나 수업코드가 없어요. 이 경우 <b>PIN 칸에 오프라인 해제 암호</b>를 넣으면 <b>이 기기만</b> 열립니다.'
-    : '이 수업코드로 접속한 <b>모든 학생 화면</b>이 15초 안에 함께 열립니다.';
-  syncGateUI();
-  $('#tchBg').classList.add('on');
-});
 $$('.tch-go').forEach(b=>b.addEventListener('click',async()=>{
   const stage=parseInt(b.dataset.stage,10)|0;
-  const code=$('#tchCode').value.trim().toUpperCase(), pin=$('#tchPin').value;
+  const code=TCH.code, pin=TCH.pin;
   const err=$('#tchErr'); err.textContent='';
   /* ① 서버: 수업코드 + 교사 PIN → 반 전체 해제 */
   if(code&&!gateNoDb){
     try{
       const r=await fetch(GATE_API,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({code:code,stage:stage,pin:pin})});
-      if(r.status===403){ err.textContent='교사 PIN이 맞지 않습니다.'; return; }
-      if(r.status===503){ gateNoDb=true; err.textContent='서버(순위판 DB)가 연결되지 않았어요. 오프라인 암호를 쓰세요.'; return; }
+      if(r.status===403){ err.textContent='교사 PIN이 맞지 않습니다. 다시 로그인하세요.'; tchShowPanel(false); return; }
+      if(r.status===503){ gateNoDb=true; err.textContent='서버가 연결되지 않았어요. 오프라인 암호로 진행하세요.'; return; }
       if(!r.ok){ err.textContent='실패했어요. 잠시 후 다시 시도하세요.'; return; }
       err.innerHTML='<span style="color:var(--ok)">✅ 반 전체에 적용했어요 (학생 화면은 15초 안에 열립니다)</span>';
       if(code===(NB.code||'')) gateSet(stage);
@@ -2911,8 +2985,6 @@ $$('.tch-go').forEach(b=>b.addEventListener('click',async()=>{
 
 /* ---------- 시작 ---------- */
 buildLab(); showLabStep(0);
-/* 주소 끝에 ?t=1 을 붙이면 교사용 진도 패널이 나타납니다 */
-if(/[?&]t=1\b/.test(location.search)) $('#tchFab').style.display='';
 syncGateUI();
 const BRIEF_BEATS=[
  {sub:'CASE No. SOLOMON-2026',t1:'2026년 7월 8일 · 밤 11시 47분',t2:'솔로몬 법정'},
