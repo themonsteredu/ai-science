@@ -809,6 +809,8 @@ h1,h2,h3,p{margin:0}
 .paper .ind-ev.sel{background:#efe0b6;border-color:#8a7550;box-shadow:inset 0 0 0 1px #8a7550}
 .paper .ind-rsn textarea{background:#fffdf4;border-color:#c9b48a;color:#2a2116}
 .paper .ind-rsn .rl{color:#6d5c41}
+.paper .ind-words b{color:#8a6d3a}
+.paper .ind-words i{border-color:#b59a68;color:#4a3a22;background:rgba(160,130,80,.1)}
 .paper .hintbtn{color:#8a6d3a;border-color:#b59a68;background:transparent}
 .paper .hinttx{color:#5d4e35;border-left-color:#b59a68;background:rgba(138,117,80,.08)}
 .paper .result{background:rgba(181,38,42,.07);border-color:#b5262a;color:#8c2024}
@@ -821,6 +823,11 @@ h1,h2,h3,p{margin:0}
 .ind-ev.sel{border-color:var(--gold);background:rgba(232,176,75,.14);font-weight:700}
 .ind-rsn{margin:8px 0}
 .ind-rsn .rl{font-size:12px;color:var(--muted);margin-bottom:4px}
+/* 보기 단어 — 아이가 보고 직접 타이핑한다 (누르는 기능 없음) */
+.ind-words{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0 0 6px}
+.ind-words b{font-size:11.5px;color:var(--gold-soft);font-family:var(--fontm);margin-right:2px}
+.ind-words i{font-style:normal;font-size:12px;padding:3px 9px;border-radius:20px;
+  border:1px dashed var(--gold-soft);color:var(--gold);background:rgba(232,176,75,.06);user-select:text}
 .ind-rsn textarea{width:100%;min-height:44px;background:#0c0904;border:1px solid var(--line);border-radius:9px;
   color:var(--ink);font-family:var(--fontd);font-size:13px;padding:8px 10px;resize:vertical}
 .ind-rsn textarea:focus{outline:none;border-color:var(--gold-soft)}
@@ -2468,19 +2475,45 @@ window.togEv=function(i){
 };
 const IND_HINTS={
  print:'이 지문이 <b>누구의 것</b>으로 판명됐고, <b>어디</b>에서 나왔는지 연결해 보세요.',
- blood:'이 혈액형이 후보를 <b>몇 명으로, 누구로</b> 좁혀 주었는지 떠올려 보세요.',
+ blood:'이 혈액형이 후보를 <b>몇 명으로, 누구로</b> 좁혀 주었는지 떠올려 보세요. 혈액형 하나로 <b>한 사람을 단정</b>할 수 있을까요?',
  witness:'목격된 <b>시각</b>과 USB가 열린 <b>시각</b>을 비교해 보세요.',
  log:'그 <b>시각에 노트북 앞에 있던 사람</b>이 누구인지, 다른 증거와 이어 보세요.',
  trash:'증거가 사라지면 <b>누가 이득</b>을 보는지 생각해 보세요.',
  lie:'그는 <b>왜 거짓말</b>을 했을까요? 무엇을 숨기고 싶었을까요?'
 };
+/* 증거별 보기 단어 + 채점용 개념
+   words = 아이에게 보여줄 보기 단어 (누르는 기능 없음 — 보고 직접 타이핑한다)
+   need  = 반드시 담겨야 할 개념 2개. 각 개념은 동의어 배열이고 하나만 맞으면 통과
+   ask   = 빠진 개념을 되물을 때 쓰는 문구 (정답을 그대로 알려주지 않는다) */
+const IND_WORDS={
+ print:{words:['커피잔','감식 카드','와상문','일치','강도훈'],
+        need:[['커피잔','감식','와상문'],['강도훈']],
+        ask:['이 지문이 어디에서 나왔는지','그래서 누구의 지문인지']},
+ blood:{words:['A형','혈액형','후보','강도훈','정서연','좁혀진다'],
+        need:[['a형','혈액형'],['후보','좁','두 명','2명','둘']],
+        ask:['어떤 혈액형인지','후보가 어떻게 좁혀지는지']},
+ witness:{words:['11시 47분','목격','노트북','시각','일치'],
+        need:[['11시 47','11시47','1147','47분'],['목격','노트북','시각']],
+        ask:['목격된 시각','그 시각이 무엇과 맞아떨어지는지']},
+ log:{words:['11시 47분','USB','열람','시각','기록'],
+        need:[['11시 47','11시47','1147','47분'],['usb','열람','열']],
+        ask:['열린 시각','무엇이 열렸는지']},
+ trash:{words:['증거 목록','찢어','이득','동기','인멸'],
+        need:[['이득','동기'],['인멸','없애','없앨','숨기','찢']],
+        ask:['누가 이득을 보는지','무엇을 하려 한 것인지']},
+ lie:{words:['커피','거짓','진술','지문','숨기려'],
+        need:[['거짓','모순','안 마셨','거짖'],['커피','지문']],
+        ask:['진술이 어떻다는 것인지','무엇과 어긋나는지']}
+};
 function renderIndReasons(){
   const w=$('#indReasons');
   const prev={}; w.querySelectorAll('textarea').forEach(t=>prev[t.dataset.k]=t.value);
   w.innerHTML=[...IND.sel].map(i=>{ const e=INDICT_EV[i];
+    const W=IND_WORDS[e.k];
     return '<div class="ind-rsn"><div class="rl">'+e.lb+'</div>'+
       '<div class="rl">양식: 「 이 증거는 ______ 을(를) 보여준다. 그래서 ______ 이다. 」</div>'+
-      '<textarea data-k="'+e.k+'" placeholder="양식에 맞춰 나의 문장으로 쓰세요">'+(prev[e.k]||'')+'</textarea>'+
+      (W?'<div class="ind-words"><b>보기</b>'+W.words.map(x=>'<i>'+x+'</i>').join('')+'</div>':'')+
+      '<textarea data-k="'+e.k+'" placeholder="보기 단어를 넣어 나의 문장으로 쓰세요">'+(prev[e.k]||'')+'</textarea>'+
       '<button class="hintbtn" onclick="togHint(this)">💡 힌트보기</button>'+
       '<div class="hinttx">'+(IND_HINTS[e.k]||'')+'</div></div>';
   }).join('');
@@ -2511,6 +2544,20 @@ $('#indSubmit').addEventListener('click',()=>{
   const vals=Object.values(reasons).map(norm);
   if(new Set(vals).size<vals.length){
     reject('⚖️ 반려 — 세 증거의 근거가 <b>서로 똑같습니다</b>. 증거마다 <b>그 증거에 맞는</b> 근거를 따로 쓰세요!'); return;
+  }
+  /* 보기 단어의 핵심 개념이 담겼는지 확인.
+     이건 반려가 아니라 코칭이라 감점하지 않는다 — 서술을 다듬는 동안 점수가 깎이면 안 되니까 */
+  const coach=(msg)=>{ r.className='result show'; r.innerHTML=msg; sfx('tick'); };
+  for(const k of keys){
+    const W=IND_WORDS[k]; if(!W)continue;
+    const tx=norm(reasons[k]);
+    const miss=W.need.map((grp,gi)=>grp.some(w=>tx.includes(norm(w)))?null:gi).filter(gi=>gi!==null);
+    if(miss.length){
+      const lb=INDICT_EV.find(e=>e.k===k).lb;
+      coach('🔎 <b>'+lb+'</b> 근거에 <b>'+miss.map(gi=>W.ask[gi]).join('</b>, <b>')+'</b>가 빠졌어요.<br>'+
+        '위의 <b>보기 단어</b>를 다시 보고 문장에 넣어 주세요. <span style="color:var(--muted)">(이 안내는 점수를 깎지 않아요)</span>');
+      return;
+    }
   }
   // 기소장 점수: 100점 만점, 반려/기각 1회당 -12점 (최저 40)
   S.indictScore=Math.max(40,100-S.indictRejects*12);
