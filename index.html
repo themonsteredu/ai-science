@@ -323,6 +323,10 @@ h1,h2,h3,p{margin:0}
 .tab.active .n{border-color:var(--gold);color:var(--gold);background:rgba(232,176,75,.12)}
 .tab.active .tx b{color:#fff}
 .tab.done .n{border-color:var(--ok);color:var(--ok)}
+/* 교사가 아직 열지 않은 단계 */
+.tab.locked{opacity:.45;cursor:not-allowed}
+.tab.locked .n::after{content:'🔒';font-size:13px;position:absolute;margin:-16px 0 0 16px}
+.tab.locked .n{position:relative}
 /* ===== 현장 사진 배경 + 핫스팟 ===== */
 .scene-wrap{position:relative;container-type:inline-size;border:1px solid #3a2c19;border-radius:16px;overflow:hidden;
   box-shadow:0 24px 60px rgba(0,0,0,.55);aspect-ratio:1194/740;background:var(--scene) center/cover,#060402}
@@ -852,6 +856,18 @@ h1,h2,h3,p{margin:0}
   color:var(--gold);font-weight:800;font-size:14px;padding:11px 16px;border-radius:30px;
   box-shadow:0 10px 30px rgba(0,0,0,.55);transition:.15s}
 .rank-fab:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(232,176,75,.25)}
+/* ==== 교사용 진도 열기 ==== */
+.tch-fab{position:fixed;left:14px;bottom:126px;z-index:60;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,#132029,#0d161c);border:1px solid var(--ai);
+  color:var(--ai);font-weight:800;font-size:14px;padding:11px 16px;border-radius:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,.55);transition:.15s}
+.tch-fab:hover{transform:translateY(-2px)}
+.tch-now{font-family:var(--fontm);font-size:13px;color:var(--gold);background:#140f08;
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:12px;text-align:center}
+.tch-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.tch-btns .tch-go{width:100%;justify-content:center}
+.tch-note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}
+.tch-note b{color:var(--gold-soft)}
 .rank-tabs{display:flex;gap:8px;align-items:center;margin:6px 0 12px}
 .rk-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--line);background:#0c0904;
   color:var(--muted);font-size:13.5px;font-weight:700}
@@ -1203,6 +1219,28 @@ h1,h2,h3,p{margin:0}
   </div>
 </div>
 
+<!-- 교사용 진도 열기 (주소 끝에 ?t=1 을 붙였을 때만 보입니다) -->
+<button class="tch-fab" id="tchFab" style="display:none">🧑‍🏫 <span>진도 열기</span></button>
+<div class="dlg-bg" id="tchBg">
+  <div class="dlg" style="max-width:460px">
+    <button class="x" id="tchX">✕</button>
+    <div class="dlg-head">🧑‍🏫 교사용 · 진도 열기</div>
+    <div class="tch-now" id="tchNow">현재 열린 단계: —</div>
+    <label class="login-lb">수업코드</label>
+    <input class="login-in" id="tchCode" maxlength="24" placeholder="예: 5A반" autocomplete="off">
+    <label class="login-lb">교사 PIN <span class="login-hint">(서버에 설정한 값)</span></label>
+    <input class="login-in" id="tchPin" type="password" maxlength="32" placeholder="TEACHER_PIN" autocomplete="off">
+    <div class="tch-btns">
+      <button class="btn ghost cbtn tch-go" data-stage="1">① 과학 수사 열기</button>
+      <button class="btn ghost cbtn tch-go" data-stage="2">② AI 분석 · 기소장 열기</button>
+      <button class="btn ghost cbtn tch-go" data-stage="3">③ 마무리 열기</button>
+      <button class="btn ghost cbtn tch-go" data-stage="0">↺ 처음으로 되돌리기</button>
+    </div>
+    <div class="login-err" id="tchErr"></div>
+    <div class="tch-note" id="tchNote"></div>
+  </div>
+</div>
+
 <!-- 우리 반 순위판 -->
 <button class="rank-fab" id="rankFab" style="display:none">🏆 <span>순위판</span></button>
 <div class="dlg-bg" id="rankBg">
@@ -1428,9 +1466,28 @@ S.indictRejects=0;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1700);}
 
+/* ---------- 진도 잠금 (교사가 열어줘야 다음 단계로) ----------
+   0 = 현장 조사만 / 1 = 과학 수사 / 2 = AI 분석·기소장 / 3 = 마무리
+   수업코드가 없으면(혼자 연습 모드) 잠금을 걸지 않는다 */
+const GATED={lab:1,ai:2,court:3};
+const GATE={stage:0};
+try{ GATE.stage=Math.max(0,Math.min(3,parseInt(localStorage.getItem('solomon_gate')||'0',10)||0)); }catch(e){}
+function gateActive(){ return !!(NB&&NB.code); }
+function gateOpen(n){ return !gateActive() || GATE.stage>=n; }
+function gateSet(n){
+  n=Math.max(0,Math.min(3,n|0));
+  if(n===GATE.stage) return false;
+  GATE.stage=n;
+  try{ localStorage.setItem('solomon_gate',String(n)); }catch(e){}
+  syncGateUI();
+  return true;
+}
+
 /* ---------- 탭 전환 ---------- */
 $$('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.tab)));
 function go(id){
+  const need=GATED[id];
+  if(need&&!gateOpen(need)){ toast('🔒 선생님이 열어주면 다음 단계로 갈 수 있어요'); sfx('wrong'); return; }
   $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
   $$('.page').forEach(p=>p.classList.toggle('on',p.id===id));
   if(id==='ai') syncAi();
@@ -1648,7 +1705,7 @@ $$('.hotspot').forEach(h=>{
       collectEvidence(id);
       showDiscovery(SCENE_INTEL[id]);
       S._pending=id;
-      if(S.clues.size===7){ $('#toLab').disabled=false; markTabDone(0); }
+      if(S.clues.size===7){ markTabDone(0); syncGateUI(); }
     }
     openDialogue(id);
   });
@@ -2109,7 +2166,7 @@ function labDone(id,expEl){
   $('#'+expEl).classList.add('done');
   $('#expCount').textContent=S.exps.size;
   renderLabSteps();
-  if(S.exps.size===4){ $('#toAi').disabled=false; markTabDone(1); }
+  if(S.exps.size===4){ markTabDone(1); syncGateUI(); }
   const p=LAB_PASS[id];
   if(id==='print'){ showPass({...p,cb:()=>go('ai')}); }
   else{ const nx=labIdx+1; showPass({...p,cb:()=>showLabStep(nx)}); }
@@ -2494,7 +2551,7 @@ function checkCode(cur){
     $('#safeMsg').innerHTML='<span style="color:var(--ok);font-weight:800">🔓 금고 열림! USB를 되찾았어요.</span><br>'+
       '닳은 키패드 <b>1·4·7</b> + "그 시각이 열쇠다" + USB가 열린 <b>밤 11시 47분</b> = <b>1147</b>. 훌륭한 추리!<br>금고 안에서 강도훈의 자백 메모도 나왔어요.';
     $('#codeDisp').style.color='var(--ok)';
-    $('#toCourt').disabled=false; S.aiDone=true; markTabDone(2);
+    S.aiDone=true; markTabDone(2); syncGateUI();
     toast('금고 해제! 모의 재판으로!');
   }else{
     safeTries++;
@@ -2717,6 +2774,85 @@ $('#nbMemo').addEventListener('input',e=>{ NB.memo=e.target.value; saveNb(); });
 $('#nbName').addEventListener('input',e=>{ NB.name=e.target.value.trim(); saveNb(); });
 buildNb();
 
+/* ---------- 진도 잠금 UI + 교사 패널 ---------- */
+/* 단계별 다음 버튼: 게이트가 열리면 본인 진도와 무관하게 활성화된다 (반 진도를 맞추기 위해) */
+const GATE_BTN=[
+ {id:'toLab',  need:1,open:'▶ 과학 수사 시작',    wait:'단서 7개를 모두 모으면 → 과학 수사 시작',done:()=>S.clues.size===7},
+ {id:'toAi',   need:2,open:'▶ AI 분석 시작',      wait:'감식 4종을 모두 끝내면 → AI 분석',      done:()=>S.exps.size===4},
+ {id:'toCourt',need:3,open:'▶ 모의 재판 시작',    wait:'금고를 열면 → 모의 재판',               done:()=>!!S.safeOpen}
+];
+function syncGateUI(){
+  $$('.tab').forEach(t=>{ const n=GATED[t.dataset.tab]; t.classList.toggle('locked',!!n&&!gateOpen(n)); });
+  GATE_BTN.forEach(b=>{
+    const el=$('#'+b.id); if(!el)return;
+    if(!gateActive()){ el.disabled=!b.done(); el.textContent=b.done()?b.open:b.wait; return; }
+    if(gateOpen(b.need)){ el.disabled=false; el.textContent=b.open; }
+    else{ el.disabled=true; el.textContent='🔒 선생님이 열어주면 시작합니다'; }
+  });
+  const now=$('#tchNow');
+  if(now) now.textContent='현재 열린 단계: '+(['① 전 (현장 조사만)','① 과학 수사','② AI 분석·기소장','③ 마무리'][GATE.stage]);
+}
+
+/* 서버에서 열린 단계를 받아온다 (수업코드가 있을 때만) */
+const GATE_API='/api/gate';
+let gateNoDb=false, _gatePollTimer=null;
+async function fetchGate(){
+  if(!gateActive())return;
+  try{
+    const r=await fetch(GATE_API+'?code='+encodeURIComponent(NB.code),{cache:'no-store'});
+    if(r.status===503){ gateNoDb=true; return; }
+    if(!r.ok)return;
+    const j=await r.json(); gateNoDb=false;
+    const prev=GATE.stage;
+    if(gateSet(j.stage|0)&&GATE.stage>prev){ toast('🔓 선생님이 다음 단계를 열었어요!'); sfx('key'); }
+  }catch(e){ gateNoDb=true; }
+}
+function startGatePoll(){
+  if(_gatePollTimer||!gateActive())return;
+  fetchGate();
+  _gatePollTimer=setInterval(fetchGate,15000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) fetchGate(); });
+}
+
+/* 오프라인(서버 없이 USB로 쓸 때) 폴백 암호 — 소스에서 바로 읽히지 않도록 해시로만 저장한다.
+   작정하고 찾으면 뚫리므로, 인터넷이 되는 교실에서는 위의 서버 방식(교사 PIN)을 쓰세요. */
+function h32(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36); }
+const GATE_FALLBACK=['','1mlzi4m','1co5pdl','m0cfhd'];
+
+$('#tchX').addEventListener('click',()=>$('#tchBg').classList.remove('on'));
+$('#tchFab').addEventListener('click',()=>{
+  $('#tchCode').value=$('#tchCode').value||NB.code||'';
+  $('#tchErr').textContent='';
+  $('#tchNote').innerHTML=gateNoDb||!NB.code
+    ? '서버가 연결되지 않았거나 수업코드가 없어요. 이 경우 <b>PIN 칸에 오프라인 해제 암호</b>를 넣으면 <b>이 기기만</b> 열립니다.'
+    : '이 수업코드로 접속한 <b>모든 학생 화면</b>이 15초 안에 함께 열립니다.';
+  syncGateUI();
+  $('#tchBg').classList.add('on');
+});
+$$('.tch-go').forEach(b=>b.addEventListener('click',async()=>{
+  const stage=parseInt(b.dataset.stage,10)|0;
+  const code=$('#tchCode').value.trim().toUpperCase(), pin=$('#tchPin').value;
+  const err=$('#tchErr'); err.textContent='';
+  /* ① 서버: 수업코드 + 교사 PIN → 반 전체 해제 */
+  if(code&&!gateNoDb){
+    try{
+      const r=await fetch(GATE_API,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({code:code,stage:stage,pin:pin})});
+      if(r.status===403){ err.textContent='교사 PIN이 맞지 않습니다.'; return; }
+      if(r.status===503){ gateNoDb=true; err.textContent='서버(순위판 DB)가 연결되지 않았어요. 오프라인 암호를 쓰세요.'; return; }
+      if(!r.ok){ err.textContent='실패했어요. 잠시 후 다시 시도하세요.'; return; }
+      err.innerHTML='<span style="color:var(--ok)">✅ 반 전체에 적용했어요 (학생 화면은 15초 안에 열립니다)</span>';
+      if(code===(NB.code||'')) gateSet(stage);
+      syncGateUI(); return;
+    }catch(e){ gateNoDb=true; }
+  }
+  /* ② 오프라인 폴백: 이 기기만 해제 */
+  if(stage===0){ gateSet(0); err.innerHTML='<span style="color:var(--ok)">↺ 이 기기를 처음으로 되돌렸어요</span>'; return; }
+  if(h32(pin.trim())!==GATE_FALLBACK[stage]){ err.textContent='해제 암호가 맞지 않습니다.'; return; }
+  gateSet(stage);
+  err.innerHTML='<span style="color:var(--ok)">✅ 이 기기에서 열었어요</span>';
+}));
+
 /* ---------- 헤더 접기 (스크롤을 내리면 증거물 볼 공간을 넓힌다) ---------- */
 (function(){
   const tb=$('#topBar'); if(!tb)return;
@@ -2728,6 +2864,9 @@ buildNb();
 
 /* ---------- 시작 ---------- */
 buildLab(); showLabStep(0);
+/* 주소 끝에 ?t=1 을 붙이면 교사용 진도 패널이 나타납니다 */
+if(/[?&]t=1\b/.test(location.search)) $('#tchFab').style.display='';
+syncGateUI();
 const BRIEF_BEATS=[
  {sub:'CASE No. SOLOMON-2026',t1:'2026년 7월 8일 · 밤 11시 47분',t2:'솔로몬 법정'},
  {sub:'사건 개요',t1:'재판을 하루 앞둔 밤,',t2:'핵심 증거 USB가 사라졌다'},
@@ -2766,6 +2905,8 @@ function beginGame(){
   setTimeout(()=>{i.style.display='none';},600);
   $('#loginBg').classList.remove('on');
   if(NB.code) $('#rankFab').style.display='';
+  /* 수업코드로 들어왔으면 진도 잠금이 켜진다 — 교사가 열어줄 때까지 다음 단계로 못 간다 */
+  syncGateUI(); startGatePoll();
   playBriefing();
 }
 $('#lgSolo').addEventListener('click',()=>{
