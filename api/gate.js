@@ -14,10 +14,31 @@
 const MAX_STAGE = 3;
 const TTL = 60 * 60 * 12;
 
+// REST 방식으로 쓸 수 있는 https URL + 토큰 조합을 찾는다.
+// (rediss:// 로 시작하는 REDIS_URL 만 있으면 REST 호출이 안 되므로 진단에서 알려준다)
+const URL_KEYS = ['UPSTASH_REDIS_REST_URL', 'KV_REST_API_URL'];
+const TOKEN_KEYS = ['UPSTASH_REDIS_REST_TOKEN', 'KV_REST_API_TOKEN'];
+const HINT_KEYS = ['REDIS_URL', 'KV_URL', 'UPSTASH_REDIS_URL', 'REDIS_TOKEN'];
+
 function env() {
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-  return url && token ? { url: url, token: token } : null;
+  const url = URL_KEYS.map(k => process.env[k]).find(Boolean);
+  const token = TOKEN_KEYS.map(k => process.env[k]).find(Boolean);
+  return url && token && /^https?:\/\//.test(url) ? { url: url, token: token } : null;
+}
+
+// 어떤 변수가 들어와 있는지 이름만 알려준다 (값은 절대 내보내지 않는다)
+function diag() {
+  const seen = k => !!process.env[k];
+  return {
+    db: !!env(),
+    teacherPin: !!process.env.TEACHER_PIN,
+    found: URL_KEYS.concat(TOKEN_KEYS, HINT_KEYS).filter(seen),
+    hint: !env()
+      ? (HINT_KEYS.some(seen)
+          ? 'Redis 가 연결돼 있지만 REST 주소·토큰이 없습니다. Upstash 통합에서 REST API(UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)를 노출하도록 다시 연결하세요.'
+          : 'Vercel Marketplace 에서 Upstash Redis 를 연결한 뒤 재배포하세요.')
+      : (process.env.TEACHER_PIN ? '정상입니다.' : '환경변수 TEACHER_PIN 을 설정한 뒤 재배포하세요.'),
+  };
 }
 
 async function redis(cmds) {
@@ -54,7 +75,10 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
-  if (!env()) return res.status(503).json({ error: 'no-db' });
+  // 설정 진단: /api/gate?diag=1  — 어떤 환경변수가 들어와 있는지 이름만 보여준다
+  if (req.method === 'GET' && req.query && req.query.diag) return res.status(200).json(diag());
+
+  if (!env()) return res.status(503).json({ error: 'no-db', diag: diag() });
 
   try {
     if (req.method === 'GET') {
