@@ -314,6 +314,12 @@ h1,h2,h3,p{margin:0}
 .steps .chev{color:#5a4a30;font-size:20px;flex:0 0 auto}
 .tab{display:flex;align-items:center;gap:11px;padding:9px 14px;border-radius:12px;border:1.5px solid transparent;
   white-space:nowrap;flex:0 0 auto;background:transparent}
+/* 반 연결 표시 — 코드를 잘못 적어 혼자만 안 열리는 경우를 바로 알아채게 한다 */
+.gate-badge{flex:0 0 auto;white-space:nowrap;font-family:var(--fontm);font-size:11.5px;
+  color:var(--gold-soft);background:#140f08;border:1px solid var(--line);border-radius:20px;padding:7px 12px}
+.gate-badge b{color:var(--gold)}
+.gate-badge.bad{color:var(--danger);border-color:rgba(224,96,74,.5);background:rgba(224,96,74,.08)}
+.gate-badge.bad b{color:var(--danger)}
 .tab .n{width:34px;height:34px;border-radius:9px;background:#171009;border:1px solid var(--line);display:grid;
   place-items:center;font-family:var(--fontm);font-size:15px;font-weight:700;color:var(--muted)}
 .tab .tx{display:flex;flex-direction:column;line-height:1.25;text-align:left}
@@ -782,6 +788,9 @@ h1,h2,h3,p{margin:0}
 /* ==== 기소장 (실제 공소장 양식 · 전체 화면 서류) ==== */
 .docview{position:fixed;inset:0;z-index:215;background:rgba(4,3,1,.92);display:none;overflow-y:auto;padding:26px 14px}
 .docview.on{display:block;animation:fade .3s}
+/* 기소장을 펼치는 동안에는 떠 있는 버튼들을 숨긴다 —
+   좁은 화면에서 서류 위에 겹쳐 보기 단어와 제출 버튼을 가린다 */
+body.docopen .tch-fab,body.docopen .rank-fab,body.docopen .nb-fab,body.docopen .mute{display:none !important}
 .paper{position:relative;max-width:680px;margin:0 auto 40px;background:linear-gradient(180deg,#f7f0de,#efe5c9);
   color:#2a2116;border-radius:6px;padding:40px 36px 30px;
   font-family:'Noto Serif KR','Nanum Myeongjo','Batang','바탕',serif;
@@ -823,14 +832,33 @@ h1,h2,h3,p{margin:0}
 .ind-ev.sel{border-color:var(--gold);background:rgba(232,176,75,.14);font-weight:700}
 .ind-rsn{margin:8px 0}
 .ind-rsn .rl{font-size:12px;color:var(--muted);margin-bottom:4px}
-/* 보기 단어 — 아이가 보고 직접 타이핑한다 (누르는 기능 없음) */
-.ind-words{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0 0 6px}
+/* 보기 단어 — 누르면 지금 쓰고 있는 칸에 그대로 들어간다.
+   빈 칸에 긴 문장을 처음부터 타이핑하는 게 아이들에게 가장 큰 벽이라, 눌러서 넣게 했다 */
+.ind-words{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:2px 0 6px}
 .ind-words b{font-size:11.5px;color:var(--gold-soft);font-family:var(--fontm);margin-right:2px}
-.ind-words i{font-style:normal;font-size:12px;padding:3px 9px;border-radius:20px;
-  border:1px dashed var(--gold-soft);color:var(--gold);background:rgba(232,176,75,.06);user-select:text}
-.ind-rsn textarea{width:100%;min-height:44px;background:#0c0904;border:1px solid var(--line);border-radius:9px;
-  color:var(--ink);font-family:var(--fontd);font-size:13px;padding:8px 10px;resize:vertical}
-.ind-rsn textarea:focus{outline:none;border-color:var(--gold-soft)}
+.ind-words i{font-style:normal;font-size:12.5px;padding:5px 11px;border-radius:20px;cursor:pointer;
+  border:1px dashed var(--gold-soft);color:var(--gold);background:rgba(232,176,75,.06);transition:.12s}
+.ind-words i:hover{background:rgba(232,176,75,.18);border-style:solid}
+.ind-words i:active{transform:scale(.94)}
+/* 「이 증거는 ___ 을(를) 보여준다. 그래서 ___ 이다.」 — 문장을 통째로 쓰는 대신 두 칸만 채운다 */
+.ind-fill{font-size:13.5px;margin:2px 0 4px}
+.ind-fill .ln{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 6px;margin-bottom:7px;line-height:1.8}
+.ind-b{flex:1 1 170px;min-width:0;max-width:330px;background:#0c0904;border:none;border-bottom:1.5px solid var(--gold-soft);
+  color:var(--ink);font-family:var(--fontd);font-size:13.5px;padding:5px 8px;border-radius:6px 6px 0 0}
+.ind-b:focus{outline:none;border-bottom-color:var(--gold);background:rgba(232,176,75,.08)}
+.ind-b.here{background:rgba(232,176,75,.12);border-bottom-color:var(--gold)}
+.ind-b.miss{border-bottom-color:var(--danger);background:rgba(224,96,74,.1)}
+.paper .ind-fill{color:#2a2116}
+.paper .ind-b{background:#fffdf4;color:#2a2116;border-bottom-color:#8a7550}
+.paper .ind-b:focus,.paper .ind-b.here{background:rgba(138,117,80,.12);border-bottom-color:#2a2116}
+.paper .ind-b.miss{border-bottom-color:#b5262a;background:rgba(181,38,42,.1)}
+.p-ok{border-bottom-color:#2f7d3a !important;background:rgba(47,125,58,.1) !important}
+.ind-tip{font-size:12px;color:var(--muted);line-height:1.6;margin:6px 0 2px}
+.paper .ind-tip{color:#6d5c41}
+.ind-ev .tag{font-size:10.5px;font-family:var(--fontm);margin-left:6px;padding:1px 6px;border-radius:20px;
+  border:1px solid currentColor;opacity:.8}
+.ind-ev .tag.d{color:#2f7d3a}
+.ind-ev .tag.c{color:#8a6d3a}
 
 /* ==== 로그인 ==== */
 .login-bg{position:fixed;inset:0;z-index:250;background:radial-gradient(120% 90% at 50% -10%,#211609,#0e0b07 60%,#080602);
@@ -879,6 +907,18 @@ h1,h2,h3,p{margin:0}
 .tch-remember{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:10px 0 2px;cursor:pointer}
 .tch-remember input{width:16px;height:16px;accent-color:var(--gold)}
 .tch-who{font-size:12.5px;color:var(--ok);font-family:var(--fontm);margin-bottom:10px;text-align:center}
+.tch-rost-h{display:flex;align-items:center;gap:8px;margin:16px 0 6px;font-size:12.5px;color:var(--gold-soft);font-family:var(--fontm)}
+.tch-rost-h .rk-refresh{margin-left:auto}
+.tch-roster{max-height:34vh;overflow-y:auto;font-size:12.5px;line-height:1.5}
+.tch-roster i{color:var(--muted);font-style:normal}
+.tch-rrow{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;
+  border:1px solid var(--line);background:var(--panel);margin-bottom:6px}
+.tch-rrow .nm{font-weight:800;flex:1;color:var(--ink)}
+.tch-rrow .st{font-family:var(--fontm);font-size:11.5px;color:var(--ok)}
+.tch-rrow .ago{font-family:var(--fontm);font-size:11px;color:var(--muted);width:52px;text-align:right}
+.tch-rrow.behind{border-color:var(--danger);background:rgba(224,96,74,.09)}
+.tch-rrow.behind .st{color:var(--danger)}
+.tch-rrow.stale{opacity:.5}
 /* 로그인 화면(z-index 250) 위에서도 열려야 한다 */
 #tchBg{z-index:260}
 .rank-tabs{display:flex;gap:8px;align-items:center;margin:6px 0 12px}
@@ -947,6 +987,9 @@ h1,h2,h3,p{margin:0}
     <div class="stat"><div class="lb">감식 실험</div><div class="vl"><span id="expCount">0</span> / 4</div></div>
     <div class="stat"><div class="lb">추리 점수</div><div class="vl"><span id="deduceScore">0</span></div></div>
   </div>
+  <!-- 내가 어느 반 코드로 붙어 있고 몇 단계까지 열렸는지 (수업코드로 들어왔을 때만).
+       단계 탭 줄은 좁은 화면에서 옆으로 밀려 안 보이므로 늘 보이는 상단바에 둔다 -->
+  <button class="gate-badge" id="gateBadge" style="display:none"></button>
 </div>
 
 <!-- ===================== 단계 탭 ===================== -->
@@ -1072,6 +1115,7 @@ h1,h2,h3,p{margin:0}
             <option value="usb">증거 USB</option><option value="jacket">가죽 자켓</option><option value="file">기밀 문서</option></select>
             을(를) 몰래 빼내어 금고에 숨기고, 증거 목록을 찢어 없애는 방법으로 증거를 인멸하려 하였다.</p>
           <div class="p-h">입 증 방 법 <span id="indPickCount" style="letter-spacing:0;font-size:12.5px">0 / 3</span></div>
+          <div class="ind-tip">증거를 <b>3개</b> 고르세요. <b>직접</b> 증거(지문·혈흔)는 <b>꼭 2개 다</b> 넣어야 재판에 넘길 수 있어요.</div>
           <div class="ind-evs" id="indEvs"></div>
           <div id="indReasons"></div>
           <div class="p-sign">2026년 7월 9일<br>검사 <span id="pSignNm">＿＿＿</span> <span>㊞</span></div>
@@ -1221,6 +1265,7 @@ h1,h2,h3,p{margin:0}
     <input class="login-in" id="lgName" maxlength="20" placeholder="예: 홍길동" autocomplete="off">
     <label class="login-lb">수업코드 <span class="login-hint">(선생님이 알려준 코드)</span></label>
     <input class="login-in" id="lgCode" maxlength="24" placeholder="예: 5A반" autocomplete="off">
+    <div class="login-hint" id="lgCodeEcho" style="text-align:left;margin-top:5px"></div>
     <div class="login-mode">
       <button class="lg-mode act" id="lgSolo" type="button">👤 개인전</button>
       <button class="lg-mode" id="lgTeam" type="button">👥 팀전</button>
@@ -1260,6 +1305,12 @@ h1,h2,h3,p{margin:0}
         <button class="btn ghost cbtn tch-go" data-stage="3">③ 마무리 열기</button>
         <button class="btn ghost cbtn tch-go" data-stage="0">↺ 처음으로 되돌리기</button>
       </div>
+      <!-- 접속 명단 — "열기가 안 먹은 학생" 을 눈으로 찾는 곳 -->
+      <div class="tch-rost-h">
+        <span>👥 접속 명단</span>
+        <button class="rk-refresh" id="tchRosterGo" type="button">새로고침</button>
+      </div>
+      <div class="tch-roster" id="tchRoster"><i>새로고침을 누르면 지금 접속한 학생이 보여요</i></div>
       <button class="login-skip" id="tchOut" type="button">로그아웃</button>
     </div>
 
@@ -1489,7 +1540,7 @@ const QUIZ=[
    ========================================================= */
 const S={clues:new Set(),exps:new Set(),code:'',aiDone:false,safeOpen:false,quizDone:new Set(),score:0,adm:new Set(),accused:false};
 S.suspicion={}; S.deduceScore=0; S.deduced=new Set(); S.tested=new Set(); S._pending=null; S._wonScene=false;
-S.indictRejects=0; S.indictShown=false;
+S.indictRejects=0; S.indictTries=0; S.indictShown=false;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1700);}
 
@@ -1499,15 +1550,23 @@ function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');
 const GATED={lab:1,ai:2,court:3};
 const GATE={stage:0};
 try{ GATE.stage=Math.max(0,Math.min(3,parseInt(localStorage.getItem('solomon_gate')||'0',10)||0)); }catch(e){}
+/* 수업코드 정규화 — 서버(api/_db.js normCode)와 같은 규칙.
+   "5-1", "5 1", "5―1" 을 모두 같은 반으로 만든다. 교실에서 "몇 명만 열기가 안 먹는"
+   사고는 거의 다 코드를 조금 다르게 적어서 생긴다. */
+function normCode(s){
+  let t=String(s==null?'':s);
+  try{ t=t.normalize('NFC'); }catch(e){}
+  return t.toUpperCase().replace(/[^0-9A-Z가-힣ㄱ-ㅎㅏ-ㅣ]/g,'').slice(0,24);
+}
 function gateActive(){ return !!(NB&&NB.code); }
 function gateOpen(n){ return !gateActive() || GATE.stage>=n; }
 function gateSet(n){
   n=Math.max(0,Math.min(3,n|0));
-  if(n===GATE.stage) return false;
+  const changed=(n!==GATE.stage);
   GATE.stage=n;
   try{ localStorage.setItem('solomon_gate',String(n)); }catch(e){}
-  syncGateUI();
-  return true;
+  syncGateUI();               /* 값이 같아도 화면은 항상 맞춰 준다 */
+  return changed;
 }
 
 /* ---------- 탭 전환 ---------- */
@@ -1515,7 +1574,9 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.tab)));
 let _nav=false;
 function go(id){
   const need=GATED[id];
-  if(need&&!gateOpen(need)){ toast('🔒 선생님이 열어주면 다음 단계로 갈 수 있어요'); sfx('wrong'); return; }
+  /* 잠겨 있으면 그 자리에서 서버에 다시 물어본다 — 폴링 차례를 기다리다
+     "선생님은 열었는데 나만 안 열린" 것처럼 보이는 일을 막는다 */
+  if(need&&!gateOpen(need)){ recheckGate(need,id); return; }
   $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
   $$('.page').forEach(p=>p.classList.toggle('on',p.id===id));
   if(id==='ai') syncAi();
@@ -1531,7 +1592,7 @@ window.addEventListener('popstate',e=>{
   /* 확대 뷰어·기소장·교사 창이 열려 있으면 뒤로가기는 그것부터 닫는다 */
   const zb=$('#zoomBg'), iw=$('#indictWrap'), tb2=$('#tchBg');
   if(zb&&zb.classList.contains('on')){ zb.classList.remove('on'); history.pushState({p:_curPage()},''); return; }
-  if(iw&&iw.classList.contains('on')){ iw.classList.remove('on'); history.pushState({p:_curPage()},''); return; }
+  if(iw&&iw.classList.contains('on')){ closeIndict(); history.pushState({p:_curPage()},''); return; }
   if(tb2&&tb2.classList.contains('on')){ tb2.classList.remove('on'); history.pushState({p:_curPage()},''); return; }
   const p=e.state&&e.state.p;
   if(p){ _nav=true; go(p); _nav=false; }
@@ -2485,19 +2546,23 @@ const INDICT_EV=[
  {k:'trash',lb:'🗑️ 찢긴 증거 목록 (동기)',direct:false},
  {k:'lie',lb:'⚡ 심문 모순 — "커피 안 마셨다" 거짓 진술',direct:false}
 ];
-const IND={sel:new Set()};
-window.openIndict=function(){ if(!S.accused)return; $('#indictWrap').classList.add('on'); sfx('tick'); };
-function closeIndict(){ $('#indictWrap').classList.remove('on'); }
+const IND={sel:new Set(),at:{}};   /* at = 증거별로 마지막에 손댄 빈 칸 (보기 단어를 넣을 자리) */
+window.openIndict=function(){ if(!S.accused)return;
+  $('#indictWrap').classList.add('on'); document.body.classList.add('docopen'); sfx('tick'); };
+function closeIndict(){ $('#indictWrap').classList.remove('on'); document.body.classList.remove('docopen'); }
 $('#indX').addEventListener('click',()=>{ closeIndict(); if(!S.indict) toast('지목 카드의 [공소장 작성] 버튼으로 다시 열 수 있어요'); });
 function buildIndict(){
+  /* 직접/정황을 라벨로 미리 보여 준다 — 나중에 "정황 증거만으로는 안 된다" 로
+     기각당하고 나서야 알게 되면 아이는 이유를 모른 채 막힌다 */
   $('#indEvs').innerHTML=INDICT_EV.map((e,i)=>
-    '<span class="ind-ev" id="indev-'+i+'" onclick="togEv('+i+')">'+e.lb+'</span>').join('');
+    '<span class="ind-ev" id="indev-'+i+'" onclick="togEv('+i+')">'+e.lb+
+    '<span class="tag '+(e.direct?'d">직접':'c">정황')+'</span></span>').join('');
   renderIndReasons();
   const pn=$('#pProsecutor');
   pn.value=NB.name||'';
   $('#pSignNm').textContent=NB.name||'＿＿＿';
-  pn.addEventListener('input',()=>{ NB.name=pn.value.trim(); saveNb(); $('#pSignNm').textContent=NB.name||'＿＿＿'; pn.classList.remove('p-bad'); });
-  ['pWho','pCharge','pTime','pItem'].forEach(id=>$('#'+id).addEventListener('change',e=>e.target.classList.remove('p-bad')));
+  pn.addEventListener('input',()=>{ NB.name=pn.value.trim(); saveNb(); $('#pSignNm').textContent=NB.name||'＿＿＿'; pn.classList.remove('p-bad','p-ok'); });
+  ['pWho','pCharge','pTime','pItem'].forEach(id=>$('#'+id).addEventListener('change',e=>e.target.classList.remove('p-bad','p-ok')));
 }
 window.togEv=function(i){
   if(S.indict)return;
@@ -2539,35 +2604,72 @@ const IND_WORDS={
         need:[['거짓','모순','안 마셨','거짖'],['커피','지문']],
         ask:['진술이 어떻다는 것인지','무엇과 어긋나는지']}
 };
+/* 서술은 빈 칸 두 개로 받는다.
+   빈 화면에 문장을 통째로 쓰게 하면 아이 대부분이 여기서 멈춘다.
+   문장 틀은 화면에 박아 두고, 아이는 두 조각만 채우면 된다 —
+   그 두 조각이 채점 기준(need[0], need[1])과 정확히 같은 자리다. */
+function indBlankVal(k,b){ const el=$('#indb-'+k+'-'+b); return el?el.value.trim():''; }
+function indSentence(k){
+  const a=indBlankVal(k,0), b=indBlankVal(k,1);
+  return (a||b)?('이 증거는 '+a+'을(를) 보여준다. 그래서 '+b+'이다.'):'';
+}
 function renderIndReasons(){
   const w=$('#indReasons');
-  const prev={}; w.querySelectorAll('textarea').forEach(t=>prev[t.dataset.k]=t.value);
+  const prev={}; w.querySelectorAll('.ind-b').forEach(t=>prev[t.dataset.k+'-'+t.dataset.b]=t.value);
   w.innerHTML=[...IND.sel].map(i=>{ const e=INDICT_EV[i];
-    const W=IND_WORDS[e.k];
+    const W=IND_WORDS[e.k]||{words:[],ask:['','']};
+    const bl=b=>'<input class="ind-b" id="indb-'+e.k+'-'+b+'" data-k="'+e.k+'" data-b="'+b+'" '+
+      'maxlength="60" autocomplete="off" placeholder="'+(W.ask[b]||'여기에 쓰세요')+'" '+
+      'value="'+esc(prev[e.k+'-'+b]||'')+'">';
     return '<div class="ind-rsn"><div class="rl">'+e.lb+'</div>'+
-      '<div class="rl">양식: 「 이 증거는 ______ 을(를) 보여준다. 그래서 ______ 이다. 」</div>'+
-      (W?'<div class="ind-words"><b>보기</b>'+W.words.map(x=>'<i>'+x+'</i>').join('')+'</div>':'')+
-      '<textarea data-k="'+e.k+'" placeholder="보기 단어를 넣어 나의 문장으로 쓰세요">'+(prev[e.k]||'')+'</textarea>'+
+      '<div class="ind-fill">'+
+        '<span class="ln">이 증거는 '+bl(0)+' 을(를) 보여준다.</span>'+
+        '<span class="ln">그래서 '+bl(1)+' 이다.</span>'+
+      '</div>'+
+      (W.words.length?'<div class="ind-words"><b>보기(눌러서 넣기)</b>'+
+        W.words.map(x=>'<i onclick="indWord(\''+e.k+'\',this)">'+x+'</i>').join('')+'</div>':'')+
       '<button class="hintbtn" onclick="togHint(this)">💡 힌트보기</button>'+
       '<div class="hinttx">'+(IND_HINTS[e.k]||'')+'</div></div>';
   }).join('');
+  /* 마지막으로 손댄 칸을 기억해 둔다 — 보기 단어를 누르면 그 칸에 들어간다 */
+  w.querySelectorAll('.ind-b').forEach(t=>{
+    t.addEventListener('focus',()=>{ IND.at[t.dataset.k]=t.dataset.b;
+      w.querySelectorAll('.ind-b').forEach(o=>o.classList.remove('here')); t.classList.add('here'); });
+    t.addEventListener('input',()=>t.classList.remove('miss'));
+  });
 }
+/* 보기 단어를 누르면 지금 쓰고 있는 칸 뒤에 붙여 준다 (같은 단어를 두 번 넣지는 않는다) */
+window.indWord=function(k,el){
+  if(S.indict)return;
+  const b=IND.at[k]||'0', box=$('#indb-'+k+'-'+b); if(!box)return;
+  const word=el.textContent;
+  if(box.value.includes(word)){ box.value=box.value.replace(word,'').replace(/\s{2,}/g,' ').trim(); }
+  else{ box.value=(box.value.trim()+' '+word).trim(); }
+  box.classList.remove('miss'); box.focus(); sfx('tick');
+};
 window.togHint=function(b){ b.nextElementSibling.classList.toggle('show'); };
-/* 3회 반려 후: 정답을 채워 보여준다. 제출 버튼은 아이가 직접 누르게 남겨 두고,
-   이 경로로 통과하면 기소장 점수는 40점으로 고정된다 */
+/* 막혔을 때: 정답을 채워 보여준다. 제출 버튼은 아이가 직접 누르게 남겨 두고,
+   이 경로로 통과하면 기소장 점수는 40점으로 고정된다.
+   두 칸짜리 빈 칸이 되면서 모범 답도 [앞칸, 뒷칸] 두 조각으로 나눠 둔다 */
 const IND_MODEL={
- print:'이 증거는 커피잔의 지문이 감식 카드와 일치함을 보여준다. 그래서 강도훈의 지문이다.',
- blood:'이 증거는 혈흔이 A형임을 보여준다. 그래서 후보가 강도훈과 정서연 둘로 좁혀진다.',
- witness:'이 증거는 11시 47분에 누군가를 목격했음을 보여준다. 그래서 USB가 열린 시각과 일치한다.'};
+ print:['커피잔 지문이 감식 카드와 일치한다는 것','강도훈의 지문이다'],
+ blood:['혈흔이 A형이라는 것','후보가 강도훈과 정서연 둘로 좁혀진다'],
+ witness:['11시 47분에 노트북 앞의 사람을 목격했다는 것','USB가 열린 시각과 일치한다'],
+ log:['USB가 밤 11시 47분에 열렸다는 것','그 시각에 노트북 앞에 있던 사람이 USB를 열었다'],
+ trash:['증거가 사라지면 강도훈이 이득을 본다는 것','증거를 인멸하려 한 것'],
+ lie:['"커피를 안 마셨다"는 진술이 거짓이라는 것','커피잔의 지문과 어긋난다']};
 window.showIndictAnswer=function(){
   if(S.indict||S.indictShown)return;
   S.indictShown=true;
   $('#pWho').value='dohoon'; $('#pCharge').value='theft'; $('#pTime').value='2347'; $('#pItem').value='usb';
-  ['pWho','pCharge','pTime','pItem'].forEach(id=>$('#'+id).classList.remove('p-bad'));
+  ['pWho','pCharge','pTime','pItem'].forEach(id=>{ $('#'+id).classList.remove('p-bad'); $('#'+id).classList.add('p-ok'); });
   IND.sel.clear();
   $$('.ind-ev').forEach(e=>e.classList.remove('sel'));
   [0,1,2].forEach(i=>togEv(i));                       /* 지문 + 혈흔 + 목격 진술 */
-  $('#indReasons').querySelectorAll('textarea').forEach(t=>{ t.value=IND_MODEL[t.dataset.k]||''; });
+  $('#indReasons').querySelectorAll('.ind-b').forEach(t=>{
+    const m=IND_MODEL[t.dataset.k]; if(m) t.value=m[t.dataset.b|0]||'';
+    t.classList.remove('miss');
+  });
   const r=$('#res-indict');
   r.className='result show';
   r.innerHTML='💡 정답을 채워 뒀어요. <b>어디가 달랐는지 비교해 보고</b>, 아래 <b>⚖️ 기소장 제출</b>을 눌러 마무리하세요. <span style="color:var(--muted)">(정답 보기를 써서 기소장 점수는 40점이에요)</span>';
@@ -2576,49 +2678,76 @@ window.showIndictAnswer=function(){
 $('#indSubmit').addEventListener('click',()=>{
   if(S.indict)return;
   const r=$('#res-indict');
-  const bad=(id,cond)=>{ $('#'+id).classList.toggle('p-bad',cond); return cond; };
-  const reject=(msg)=>{
-    S.indictRejects++; r.className='result show'; r.innerHTML=msg; sfx('wrong');
-    /* 3회 반려부터 정답을 보고 따라 쓸 수 있게 한다 — 대신 기소장 점수는 40점 고정 */
-    if(S.indictRejects>=3&&!S.indictShown)
-      r.innerHTML+='<div class="mt"><button class="btn ghost cbtn" onclick="showIndictAnswer()">💡 정답 보고 따라 쓰기 (기소장 40점)</button></div>';
-  };
+  const norm=s=>String(s).replace(/\s+/g,'').toLowerCase();
+  const bad=(id,cond)=>{ const el=$('#'+id);
+    el.classList.toggle('p-bad',cond); el.classList.toggle('p-ok',!cond); return cond; };
+  S.indictTries=(S.indictTries||0)+1;
+  /* 막힌 횟수가 두 번을 넘으면 정답을 보고 따라 쓸 길을 열어 준다.
+     (예전엔 "반려 3회" 였는데, 반려까지 가기 전에 지쳐 손을 드는 아이가 많았다) */
+  const helpBtn=()=>(S.indictTries>=2&&!S.indictShown)
+    ? '<div class="mt"><button class="btn ghost cbtn" onclick="showIndictAnswer()">💡 어려워요 — 정답 보고 따라 쓰기 (기소장 40점)</button></div>' : '';
+  /* 코칭 = 감점 없음. 빠진 곳을 짚어 주기만 한다 */
+  const coach=(msg)=>{ r.className='result show'; r.innerHTML=msg+helpBtn(); sfx('tick'); };
+  /* 반려 = 감점. 수사 결과 자체가 틀렸을 때만 쓴다 */
+  const reject=(msg)=>{ S.indictRejects++; r.className='result show'; r.innerHTML=msg+helpBtn(); sfx('wrong'); };
+
   const pname=$('#pProsecutor').value.trim();
-  if(bad('pProsecutor',!pname)){ reject('⚖️ 반려 — <b>검사(여러분) 이름</b>을 쓰세요.'); return; }
-  let wrongForm=false;
-  wrongForm=bad('pWho',$('#pWho').value!=='dohoon')||wrongForm;
-  wrongForm=bad('pCharge',$('#pCharge').value!=='theft')||wrongForm;
-  wrongForm=bad('pTime',$('#pTime').value!=='2347')||wrongForm;
-  wrongForm=bad('pItem',$('#pItem').value!=='usb')||wrongForm;
-  if(wrongForm){ reject('⚖️ 반려 — <b>붉게 표시된 칸</b>이 사건 기록과 다릅니다. 수사 결과를 떠올려 다시 채우세요.'); return; }
-  if(IND.sel.size!==3){ reject('⚖️ 반려 — 입증 방법(첨부 증거)은 <b>정확히 3개</b>여야 합니다.'); return; }
+  if(bad('pProsecutor',!pname)){ coach('✍️ <b>검사(여러분) 이름</b>을 먼저 쓰세요. <span style="color:var(--muted)">(감점 없어요)</span>'); return; }
+  /* 빈 칸으로 둔 것과 틀리게 고른 것을 구분한다 — 안 고른 걸로 감점하면 억울하다 */
+  const SEL=[{id:'pWho',ans:'dohoon',nm:'피고인'},{id:'pCharge',ans:'theft',nm:'죄명'},
+             {id:'pTime',ans:'2347',nm:'시각'},{id:'pItem',ans:'usb',nm:'물건'}];
+  const empty=SEL.filter(s=>!$('#'+s.id).value);
+  if(empty.length){
+    SEL.forEach(s=>bad(s.id,!$('#'+s.id).value));
+    coach('✍️ 아직 안 고른 칸이 있어요 — <b>'+empty.map(s=>s.nm).join(', ')+'</b>. '+
+      '<span style="color:var(--muted)">(감점 없어요)</span>'); return;
+  }
+  const wrong=SEL.filter(s=>bad(s.id,$('#'+s.id).value!==s.ans));
+  if(wrong.length){
+    reject('⚖️ 반려 — <b>'+wrong.map(s=>s.nm).join(', ')+'</b> 칸이 사건 기록과 다릅니다.<br>'+
+      '<span style="color:var(--muted)">피고인·시각·물건은 [AI 분석]의 수사 결과에, 죄명은 사건 개요에 있어요. 초록색 칸은 맞은 거예요!</span>'); return;
+  }
+  if(IND.sel.size!==3){
+    coach('✍️ 입증 방법(첨부 증거)은 <b>정확히 3개</b>예요. 지금 <b>'+IND.sel.size+'개</b> 골랐어요. '+
+      '<span style="color:var(--muted)">(감점 없어요)</span>'); return;
+  }
   const keys=[...IND.sel].map(i=>INDICT_EV[i].k);
   if(!keys.includes('print')||!keys.includes('blood')){
-    reject('🙅 변호인: "이의 있습니다! <b>정황 증거만으로는</b> 유죄를 입증할 수 없습니다."<br>⚖️ 판사: "기각합니다. <b>직접 증거(지문·혈흔)</b>를 갖춰 다시 제출하세요."'); return;
+    reject('🙅 변호인: "이의 있습니다! <b>정황 증거만으로는</b> 유죄를 입증할 수 없습니다."<br>'+
+      '⚖️ 판사: "기각합니다. <b>직접</b> 이라고 적힌 증거 <b>2개(지문·혈흔)</b>를 반드시 넣어 다시 제출하세요."'); return;
   }
-  const reasons={}; let tooShort=false;
-  $('#indReasons').querySelectorAll('textarea').forEach(t=>{ reasons[t.dataset.k]=t.value.trim(); if(t.value.trim().length<10) tooShort=true; });
-  if(tooShort){ reject('⚖️ 반려 — 근거 서술이 부족합니다. 양식에 맞춰 <b>문장으로</b> 쓰세요. (10자 이상)'); return; }
-  const norm=s=>s.replace(/\s+/g,'').toLowerCase();
+  /* 빈 칸 채우기 — 어느 칸이 비었는지 그 칸을 붉게 짚어 준다 */
+  const blanks=[...$('#indReasons').querySelectorAll('.ind-b')];
+  const short=blanks.filter(t=>t.value.trim().length<2);
+  short.forEach(t=>t.classList.add('miss'));
+  if(short.length){
+    short[0].focus();
+    coach('✍️ <b>붉게 표시된 빈 칸</b>을 채우면 돼요. 밑에 있는 <b>보기 단어를 눌러</b> 넣을 수 있어요! '+
+      '<span style="color:var(--muted)">(감점 없어요)</span>'); return;
+  }
+  const reasons={}; keys.forEach(k=>reasons[k]=indSentence(k));
   const vals=Object.values(reasons).map(norm);
   if(new Set(vals).size<vals.length){
-    reject('⚖️ 반려 — 세 증거의 근거가 <b>서로 똑같습니다</b>. 증거마다 <b>그 증거에 맞는</b> 근거를 따로 쓰세요!'); return;
+    coach('✍️ 세 증거의 근거가 <b>서로 똑같아요</b>. 증거마다 <b>그 증거에 맞는</b> 말을 골라 넣어 주세요. '+
+      '<span style="color:var(--muted)">(감점 없어요)</span>'); return;
   }
-  /* 보기 단어의 핵심 개념이 담겼는지 확인.
-     이건 반려가 아니라 코칭이라 감점하지 않는다 — 서술을 다듬는 동안 점수가 깎이면 안 되니까 */
-  const coach=(msg)=>{ r.className='result show'; r.innerHTML=msg; sfx('tick'); };
+  /* 칸마다 핵심 개념이 담겼는지 확인 — 앞칸은 need[0], 뒷칸은 need[1] 자리다.
+     이건 반려가 아니라 코칭이라 감점하지 않는다 */
   for(const k of keys){
     const W=IND_WORDS[k]; if(!W)continue;
-    const tx=norm(reasons[k]);
-    const miss=W.need.map((grp,gi)=>grp.some(w=>tx.includes(norm(w)))?null:gi).filter(gi=>gi!==null);
+    const miss=W.need.map((grp,gi)=>grp.some(w=>norm(indBlankVal(k,gi)).includes(norm(w)))?null:gi)
+                     .filter(gi=>gi!==null);
     if(miss.length){
       const lb=INDICT_EV.find(e=>e.k===k).lb;
-      coach('🔎 <b>'+lb+'</b> 근거에 <b>'+miss.map(gi=>W.ask[gi]).join('</b>, <b>')+'</b>가 빠졌어요.<br>'+
-        '위의 <b>보기 단어</b>를 다시 보고 문장에 넣어 주세요. <span style="color:var(--muted)">(이 안내는 점수를 깎지 않아요)</span>');
+      miss.forEach(gi=>{ const el=$('#indb-'+k+'-'+gi); if(el)el.classList.add('miss'); });
+      const first=$('#indb-'+k+'-'+miss[0]); if(first){ first.focus(); first.scrollIntoView({block:'center',behavior:'smooth'}); }
+      const where=miss.map(gi=>(gi?'뒷':'앞')+'칸('+W.ask[gi]+')').join(', ');
+      coach('🔎 <b>'+lb+'</b> 의 <b>'+where+'</b>에 들어갈 말이 아직 없어요.<br>'+
+        '그 칸을 누르고 <b>보기 단어</b>를 눌러 넣어 보세요. <span style="color:var(--muted)">(이 안내는 점수를 깎지 않아요)</span>');
       return;
     }
   }
-  // 기소장 점수: 100점 만점, 반려/기각 1회당 -12점 (최저 40)
+  // 기소장 점수: 100점 만점, 반려(수사 결과가 틀렸을 때) 1회당 -12점 (최저 40)
   S.indictScore=S.indictShown?40:Math.max(40,100-S.indictRejects*12);
   S.indict={who:'dohoon',charge:'절도 및 증거인멸',time:'23:47',item:'증거 USB',prosecutor:pname,evs:keys,reasons:reasons,score:S.indictScore,rejects:S.indictRejects};
   r.className='result ok show';
@@ -2893,45 +3022,92 @@ function syncGateUI(){
     const el=$('#'+b.id); if(!el)return;
     if(!gateActive()){ el.disabled=!b.done(); el.textContent=b.done()?b.open:b.wait; return; }
     if(gateOpen(b.need)){ el.disabled=false; el.textContent=b.open; }
-    else{ el.disabled=true; el.textContent='🔒 선생님이 열어주면 시작합니다'; }
+    /* 잠겨 있어도 누를 수 있게 둔다 — 누르면 그 자리에서 서버에 다시 물어본다.
+       (버튼이 죽어 있으면 아이는 손 들고 기다릴 뿐, 다시 확인할 방법이 없다) */
+    else{ el.disabled=false; el.textContent='🔒 선생님이 열어주면 시작합니다 — 눌러서 확인'; }
   });
   const now=$('#tchNow');
-  if(now) now.textContent='현재 열린 단계: '+(['① 전 (현장 조사만)','① 과학 수사','② AI 분석·기소장','③ 마무리'][GATE.stage]);
+  /* 선생님 기기에는 수업코드가 없을 수도 있으니, 로그인했으면 그 반의 서버 단계를 보여 준다 */
+  const shown=(TCH.on&&TCH.stage!=null)?TCH.stage:GATE.stage;
+  if(now) now.textContent='현재 열린 단계: '+(['① 전 (현장 조사만)','① 과학 수사','② AI 분석·기소장','③ 마무리'][shown]);
+  syncGateBadge();
+}
+
+/* 학생 화면 오른쪽 아래 연결 표시.
+   "내가 어느 반 코드로 들어와 있는지" 와 "선생님 신호를 받고 있는지" 를 항상 보여 준다.
+   코드를 잘못 적어 혼자만 안 열리는 경우를 아이도 선생님도 바로 알아챌 수 있다. */
+function syncGateBadge(){
+  const el=$('#gateBadge'); if(!el)return;
+  if(!gateActive()){ el.style.display='none'; return; }
+  el.style.display='';
+  const st=['현장 조사','과학 수사','AI 분석','마무리'][GATE.stage];
+  if(gateNoDb){ el.className='gate-badge bad'; el.innerHTML='⚠️ <b>'+esc(NB.code)+'</b> · 연결 안 됨 — 눌러서 다시 시도'; return; }
+  el.className='gate-badge';
+  el.innerHTML='🔗 <b>'+esc(NB.code)+'</b> · 열린 단계: '+st;
 }
 
 /* 서버에서 열린 단계를 받아온다 (수업코드가 있을 때만) */
 const GATE_API='/api/gate';
-let gateNoDb=false, _gatePollTimer=null;
+const GATE_POLL_MS=6000;                 /* 15초는 교실에서 너무 길게 느껴진다 */
+let gateNoDb=false, _gatePollTimer=null, _gateFetching=false;
 async function fetchGate(){
-  if(!gateActive())return;
+  if(!gateActive()||_gateFetching)return false;
+  _gateFetching=true;
   try{
-    const r=await fetch(GATE_API+'?code='+encodeURIComponent(NB.code),{cache:'no-store'});
-    if(r.status===503){ gateNoDb='nodb'; return; }
-    if(!r.ok)return;
+    /* who = 접속 명단용. 선생님 화면에서 "누가 몇 단계까지 열렸는지" 를 볼 수 있다 */
+    const r=await fetch(GATE_API+'?code='+encodeURIComponent(NB.code)+
+      (NB.name?'&who='+encodeURIComponent(NB.name):'')+'&_='+Date.now(),{cache:'no-store'});
+    if(r.status===503){ gateNoDb='nodb'; syncGateBadge(); return false; }
+    if(!r.ok){ syncGateBadge(); return false; }
     const j=await r.json(); gateNoDb=false;
     const prev=GATE.stage;
-    if(gateSet(j.stage|0)&&GATE.stage>prev){ toast('🔓 선생님이 다음 단계를 열었어요!'); sfx('key'); }
-  }catch(e){ gateNoDb='offline'; }
+    const up=gateSet(j.stage|0)&&GATE.stage>prev;
+    if(up){ toast('🔓 선생님이 다음 단계를 열었어요!'); sfx('key'); }
+    return true;
+  }catch(e){ gateNoDb='offline'; syncGateBadge(); return false; }
+  finally{ _gateFetching=false; }
+}
+/* 잠긴 곳을 눌렀을 때: 즉시 서버 확인 → 열려 있으면 바로 들어간다 */
+async function recheckGate(need,id){
+  if(!gateNoDb){ toast('🔄 선생님 신호를 확인하는 중…'); }
+  const ok=await fetchGate();
+  /* 확인해 보니 이미 열려 있었다면 기다리게 하지 말고 그대로 들여보낸다 */
+  if(gateOpen(need)){ if(id) go(id); return; }
+  if(!ok&&gateNoDb) toast('⚠️ 인터넷 연결을 확인해 주세요 (새로고침)');
+  else toast('🔒 아직 잠겨 있어요. 선생님이 열어주면 바로 열립니다');
+  sfx('wrong');
 }
 /* 반 전체 해제가 왜 안 되는지 원인별로 알려준다 (인터넷 끊김 vs 서버 DB 미연결) */
 function gateNoteText(){
-  if(gateNoDb==='nodb') return '서버는 켜져 있지만 <b>DB(Upstash Redis)가 연결되지 않았어요.</b> '+
+  if(gateNoDb==='nodb') return '서버는 켜져 있지만 <b>DB가 연결되지 않았어요.</b> '+
     '그래서 <b>반 전체 해제</b>를 쓸 수 없습니다. 지금은 <b>PIN 칸에 단계별 해제 암호</b>를 넣어 <b>이 기기만</b> 열 수 있어요.<br>'+
     '배포 주소 뒤에 <b>/api/gate?diag=1</b> 을 열면 무엇이 빠졌는지 확인할 수 있습니다.';
   if(gateNoDb==='offline') return '인터넷에 연결되지 않았어요. <b>PIN 칸에 단계별 해제 암호</b>를 넣으면 <b>이 기기만</b> 열립니다.';
-  return '단계를 열면 같은 수업코드로 접속한 <b>모든 학생 화면</b>이 15초 안에 함께 열립니다.';
+  return '단계를 열면 같은 수업코드로 접속한 <b>모든 학생 화면</b>이 몇 초 안에 함께 열립니다. '+
+    '아래 <b>접속 명단</b>에서 누가 아직 안 열렸는지 확인하세요.';
 }
 function startGatePoll(){
   if(_gatePollTimer||!gateActive())return;
   fetchGate();
-  _gatePollTimer=setInterval(fetchGate,15000);
+  _gatePollTimer=setInterval(fetchGate,GATE_POLL_MS);
+  /* 태블릿·크롬북은 화면이 꺼지거나 앱을 바꾸면 타이머가 멈춘다.
+     돌아오는 모든 경로에서 곧바로 다시 물어본다 — 이게 빠지면 "몇 명만 안 열림" 이 생긴다 */
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) fetchGate(); });
+  window.addEventListener('focus',fetchGate);
+  window.addEventListener('pageshow',fetchGate);      /* 뒤로가기 캐시로 되살아난 화면 */
+  window.addEventListener('online',fetchGate);
+  syncGateBadge();
 }
+$('#gateBadge').addEventListener('click',async()=>{
+  const ok=await fetchGate();
+  toast(ok?('🔗 '+NB.code+' 에 연결돼 있어요 · 열린 단계 확인 완료')
+          :'⚠️ 연결이 안 돼요. 인터넷을 확인하고 새로고침하세요');
+});
 
 /* ---------- 교사 로그인 ----------
    PIN 은 서버(TEACHER_PIN)에만 있어서 학생이 소스를 봐도 알 수 없다.
    그래서 입구를 숨길 필요가 없고, 로그인 화면에 그냥 둔다. */
-const TCH={code:'',pin:'',on:false};
+const TCH={code:'',pin:'',on:false,stage:null};
 try{ const sv=JSON.parse(localStorage.getItem('solomon_tch')||'null');
      if(sv){ TCH.code=sv.code||''; TCH.pin=sv.pin||''; } }catch(e){}
 
@@ -2943,6 +3119,7 @@ function tchShowPanel(on){
     $('#tchFab').style.display='';
     $('#tchWho').innerHTML='✅ <b>'+esc(TCH.code||'(수업코드 없음)')+'</b> 반 담당으로 로그인';
     syncGateUI();
+    tchLoadRoster();
   }
 }
 function tchOpen(){
@@ -2963,7 +3140,8 @@ $('#lgTeacher').addEventListener('click',tchOpen);
 
 /* 로그인 — 서버가 있으면 PIN 을 확인하고, 오프라인이면 단계 암호로 넘어간다 */
 $('#tchIn').addEventListener('click',async()=>{
-  const code=$('#tchCode').value.trim().toUpperCase(), pin=$('#tchPin').value;
+  const code=normCode($('#tchCode').value), pin=$('#tchPin').value;
+  $('#tchCode').value=code;                /* 학생에게 불러 줄 코드를 그대로 보여 준다 */
   const err=$('#tchErr'); err.textContent='';
   if(!code){ err.textContent='수업코드를 입력하세요.'; return; }
   if(!pin){ err.textContent='교사 PIN을 입력하세요.'; return; }
@@ -2982,10 +3160,60 @@ $('#tchIn').addEventListener('click',async()=>{
   if(gateNoDb) $('#tchNote').innerHTML=gateNoteText();
   tchShowPanel(true);
 });
+/* ---------- 접속 명단 ----------
+   "선생님은 열었는데 몇 명만 안 열렸다" 를 눈으로 확인하는 곳.
+   · 명단에 아예 없는 학생 → 수업코드를 다르게 적었거나 아직 로그인 전
+   · 단계가 낮게 남아 있는 학생 → 화면이 잠들어 아직 신호를 못 받은 것 (그 기기에서 화면만 켜면 열린다) */
+async function tchLoadRoster(){
+  const box=$('#tchRoster'); if(!box)return;
+  if(!TCH.code||!TCH.pin){ box.innerHTML='<i>먼저 로그인하세요</i>'; return; }
+  box.innerHTML='<i>불러오는 중…</i>';
+  let j;
+  try{
+    const r=await fetch(GATE_API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({code:TCH.code,pin:TCH.pin,roster:true})});
+    if(r.status===403){ box.innerHTML='<i>교사 PIN이 맞지 않습니다. 다시 로그인하세요.</i>'; return; }
+    if(!r.ok){ box.innerHTML='<i>명단을 가져오지 못했어요.</i>'; return; }
+    j=await r.json();
+  }catch(e){ box.innerHTML='<i>인터넷 연결을 확인해 주세요.</i>'; return; }
+  TCH.stage=j.stage|0; syncGateUI();
+
+  if(!j.roster){
+    box.innerHTML='<i>접속 명단 표(solomon_presence)가 아직 없어요. '+
+      'Supabase → SQL Editor 에서 <b>api/_db.js 주석의 solomon_presence 표</b>를 만들면 여기에 명단이 보입니다. '+
+      '(만들지 않아도 나머지 기능은 그대로 동작해요)</i>';
+    return;
+  }
+  if(!j.roster.length){
+    box.innerHTML='<i><b>'+esc(j.code)+'</b> 코드로 접속한 학생이 아직 없어요. '+
+      '학생 화면의 수업코드가 <b>'+esc(j.code)+'</b> 인지 확인해 주세요.</i>';
+    return;
+  }
+  const now=Date.now(), open=j.stage|0;
+  const ago=t=>{ if(!t)return'—'; const s=Math.max(0,(now-t)/1000);
+    return s<75?Math.round(s)+'초 전':Math.round(s/60)+'분 전'; };
+  const behind=j.roster.filter(r=>(r.stage|0)<open).length;
+  box.innerHTML=
+    '<div style="margin-bottom:8px;color:var(--muted)">접속 <b style="color:var(--gold)">'+j.roster.length+'명</b>'+
+    (behind?' · <b style="color:var(--danger)">'+behind+'명 아직 안 열림</b>':' · 모두 같은 단계 ✅')+'</div>'+
+    j.roster.map(r=>{
+      const st=r.stage|0, stale=r.seenAt&&(now-r.seenAt>90000);
+      return '<div class="tch-rrow'+(st<open?' behind':'')+(stale?' stale':'')+'">'+
+        '<span class="nm">'+esc(r.name)+'</span>'+
+        '<span class="st">'+(st<open?'🔒 '+st+'단계':'✅ '+st+'단계')+'</span>'+
+        '<span class="ago">'+ago(r.seenAt)+'</span></div>';
+    }).join('')+
+    (behind?'<div class="tch-note">🔒 표시된 학생은 화면이 잠들어 신호를 못 받은 경우가 많아요. '+
+      '그 기기 화면을 켜거나 잠긴 버튼을 한 번 누르면 바로 열립니다. '+
+      '명단에 이름이 아예 없다면 <b>수업코드를 다르게 적은 것</b>이니 코드를 확인해 주세요.</div>':'');
+}
+$('#tchRosterGo').addEventListener('click',tchLoadRoster);
+
 $('#tchOut').addEventListener('click',()=>{
-  TCH.code=''; TCH.pin=''; TCH.on=false;
+  TCH.code=''; TCH.pin=''; TCH.on=false; TCH.stage=null;
   try{ localStorage.removeItem('solomon_tch'); }catch(e){}
   $('#tchPin').value=''; $('#tchErr').textContent='';
+  $('#tchRoster').innerHTML='<i>새로고침을 누르면 지금 접속한 학생이 보여요</i>';
   if(!/[?&]t=1\b/.test(location.search)) $('#tchFab').style.display='none';
   tchShowPanel(false);
 });
@@ -3007,9 +3235,13 @@ $$('.tch-go').forEach(b=>b.addEventListener('click',async()=>{
       if(r.status===403){ err.textContent='교사 PIN이 맞지 않습니다. 다시 로그인하세요.'; tchShowPanel(false); return; }
       if(r.status===503){ gateNoDb='nodb'; err.innerHTML='서버에 <b>DB(Upstash)</b>가 연결되지 않아 <b>반 전체 해제</b>를 할 수 없어요. 아래 안내대로 이 기기만 여세요.'; $('#tchNote').innerHTML=gateNoteText(); return; }
       if(!r.ok){ err.textContent='실패했어요. 잠시 후 다시 시도하세요.'; return; }
-      err.innerHTML='<span style="color:var(--ok)">✅ 반 전체에 적용했어요 (학생 화면은 15초 안에 열립니다)</span>';
+      err.innerHTML='<span style="color:var(--ok)">✅ 반 전체에 적용했어요 (학생 화면은 몇 초 안에 열립니다)</span>';
+      TCH.stage=stage;
       if(code===(NB.code||'')) gateSet(stage);
-      syncGateUI(); return;
+      syncGateUI();
+      /* 적용된 뒤 명단을 다시 읽어 "아직 안 열린 학생" 을 바로 보여 준다 */
+      tchLoadRoster(); setTimeout(tchLoadRoster,8000);
+      return;
     }catch(e){ gateNoDb='offline'; }
   }
   /* ② 오프라인 폴백: 이 기기만 해제 */
@@ -3085,9 +3317,17 @@ $('#lgSolo').addEventListener('click',()=>{
 $('#lgTeam').addEventListener('click',()=>{
   NB.mode='team'; $('#lgTeam').classList.add('act'); $('#lgSolo').classList.remove('act'); $('#lgTeamName').style.display='';
 });
+/* 입력하는 동안 "실제로 붙게 될 코드" 를 미리 보여 준다 —
+   선생님 코드와 다르게 적었는지 시작 전에 알아챌 수 있게 */
+$('#lgCode').addEventListener('input',()=>{
+  const raw=$('#lgCode').value, c=normCode(raw);
+  const el=$('#lgCodeEcho');
+  el.textContent=(!c||c===raw.trim())?'':('실제 접속 코드 → '+c);
+});
 $('#lgSkip').addEventListener('click',()=>{ NB.code=''; saveNb(); beginGame(); });
 $('#lgStart').addEventListener('click',()=>{
-  const nm=$('#lgName').value.trim(), code=$('#lgCode').value.trim().toUpperCase();
+  const nm=$('#lgName').value.trim(), code=normCode($('#lgCode').value);
+  $('#lgCode').value=code;                 /* 실제로 접속하는 코드를 그대로 보여 준다 */
   const err=$('#lgErr');
   if(!nm){ err.textContent='이름을 입력하세요.'; return; }
   if(!code){ err.textContent='수업코드를 입력하세요. (혼자 연습은 아래 링크)'; return; }

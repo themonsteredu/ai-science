@@ -46,8 +46,19 @@
 
 **온라인 (권장)** — 로그인 화면 맨 아래 **🧑‍🏫 선생님이신가요? — 교사 로그인** 으로 들어갑니다.
 수업코드와 교사 PIN으로 로그인하면 진도 패널이 열리고, 단계 버튼을 누르면 같은 수업코드로 접속한
-**모든 학생 화면이 15초 안에 함께 열립니다.** 로그인 후에는 왼쪽 아래 **🧑‍🏫 진도 열기** 버튼이 남아
+**모든 학생 화면이 몇 초 안에 함께 열립니다.** 로그인 후에는 왼쪽 아래 **🧑‍🏫 진도 열기** 버튼이 남아
 수업 중 언제든 다시 열 수 있고, "이 기기에 기억하기" 를 켜면 다음 수업부터 바로 들어갑니다.
+
+진도 패널 아래 **👥 접속 명단** 에서 지금 접속한 학생과 각자 열린 단계가 보입니다.
+🔒 로 표시되면 아직 신호를 못 받은 것이고, 명단에 이름이 아예 없으면 **수업코드를 다르게 적은 것**입니다.
+(명단은 `solomon_presence` 표를 만들었을 때만 보입니다 — 아래 SQL 참고.)
+
+**열기가 몇 명만 안 먹을 때** — 원인은 거의 둘 중 하나입니다.
+- *수업코드가 다름*: `5-1` / `5 1` / `5―1` 처럼 조금씩 다르게 적는 경우. 지금은 서버와 화면 모두
+  **한글·영문·숫자만 남기고 대문자로 맞춰** 같은 반으로 취급하므로 이 사고는 사라졌습니다.
+  학생 화면 상단바의 **🔗 배지**에 자기가 붙어 있는 코드가 그대로 보이니 바로 대조할 수 있습니다.
+- *화면이 잠들어 신호를 놓침*: 태블릿·크롬북은 화면이 꺼지면 타이머가 멈춥니다. 화면을 켜거나
+  **잠긴 버튼을 한 번 누르면** 그 자리에서 서버에 다시 물어보고 곧바로 열립니다.
 
 PIN은 서버(`TEACHER_PIN`)에만 있으므로 **입구를 숨길 필요가 없습니다** — 아이가 교사 로그인 창을
 열어봐도 PIN 없이는 아무것도 열지 못합니다. (주소에 `?t=1` 을 붙이는 지름길도 그대로 동작합니다.)
@@ -92,8 +103,18 @@ create table if not exists solomon_results (
   saved_at timestamptz not null default now(),
   primary key (code, name)
 );
+-- 접속 명단(선택) — 교사 화면에서 "누가 몇 단계까지 열렸는지" 를 보려면 만드세요.
+-- 만들지 않아도 나머지 기능은 그대로 동작합니다.
+create table if not exists solomon_presence (
+  code text not null,
+  name text not null,
+  stage int not null default 0,
+  seen_at timestamptz not null default now(),
+  primary key (code, name)
+);
 alter table solomon_gate enable row level security;
 alter table solomon_results enable row level security;
+alter table solomon_presence enable row level security;
 ```
 
 > RLS 를 정책 없이 켜 두면 외부(anon 키)에서는 접근이 막히고, 서버의 service_role 키만 통과합니다.

@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
   try {
     if (req.method === 'POST') {
       const b = db.body(req);
-      const code = db.clean(b.code, 24).toUpperCase();
+      const code = db.normCode(b.code);
       const name = db.clean(b.name, 20);
       if (!code || !name) return res.status(400).json({ error: 'code와 name이 필요합니다' });
       const row = {
@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'GET') {
-      const code = db.clean(req.query.code, 24).toUpperCase();
+      const code = db.normCode(req.query.code);
       if (!code) return res.status(400).json({ error: 'code가 필요합니다' });
       const rows = await db.listResults(code);
       // 전문 조회는 교사 PIN 이 있어야 한다 (수첩 메모·기소장 서술이 들어 있으므로)
